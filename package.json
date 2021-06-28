@@ -1,0 +1,46 @@
+{
+  "name": "linklogger",
+  "version": "1.0.0",
+  "description": "app for link shortening and logging",
+  "scripts": {
+    "start": "npm run app",
+    "app": "node build/src/app.js",
+    "watch-node": "nodemon build/src/app.js",
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w",
+    "app-debug": "nodemon --inspect build/src/app.js",
+    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run app-debug\"",
+    "check": "gts check",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run check",
+    "eslint-test": "eslint './**/*.ts'",
+    "eslint-fix": "eslint --fix './**/*.ts'",
+    "prettier-test": "prettier --check './**/*.ts'",
+    "prettier-fix": "prettier --write './**/*.ts'",
+    "lint-tests": "npm run eslint-test;npm run prettier-test",
+    "lint-fixes": "npm run eslint-fix;npm run prettier-fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devclub-iitd/LinkLogger.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/devclub-iitd/LinkLogger/issues"
+  },
+  "homepage": "https://github.com/devclub-iitd/LinkLogger#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.12",
+    "@types/node": "^15.12.5",
+    "gts": "^3.1.0",
+    "nodemon": "^2.0.7"
+  }
+}
