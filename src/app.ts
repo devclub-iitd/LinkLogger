@@ -15,8 +15,12 @@ app.get('/', (req, res) => {
 app.get('/LinkTree', (req, res) => {
   res.render('LinkTree', {
     title : 'LinkTree', 
-    username: 'UserName',
-    links: ['link1', 'link2', 'link3', 'link4']
+    head: 'DevClub',
+    links: [
+      {name:'Website', url: 'https://devclub.in/'}, 
+      {name:'GitHub', url:'https://github.com/devclub-iitd/'},
+      {name:'Recruitment', url:'https://drive.google.com/file/d/1HsUoeqMsSgESCTzvhPw9BpPWtIHfpGv6/view'},
+    ]
   });
 });
 
