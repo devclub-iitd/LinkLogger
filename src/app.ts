@@ -53,15 +53,29 @@ app.get('/LinkTree/Create', (req, res) => {
 });
 
 app.post('/LinkTree/Create', (req, res) => {
-  const title = req.body.title;
-  const link_title = req.body.link_title;
-  const original_link = req.body.original_link;
-  const link = {link_title: link_title, original_link: original_link};
-  const linktree = new linktreeMap({
-    title: title,
-    links: link,
-  });
-  linktree.save();
+  try {
+    const title = req.body.title;
+    const links = [];
+    const count = req.body.numberOfLinks;
+    console.log('Count = ' + count);
+    for (let index = 1; index <= count; index++) {
+      try {
+        const link_title = eval('req.body.link_title' + index);
+        const original_link = eval('req.body.original_link' + index);
+        const link = {link_title: link_title, original_link: original_link};
+        links.push(link);
+      } catch (error) {
+        console.log('Problem sending link ' + index + ' : ' + error);
+      }
+    }
+    const linktree = new linktreeMap({
+      title: title,
+      links: links,
+    });
+    linktree.save();
+  } catch (err) {
+    console.log('Error:  ' + err);
+  }
   res.status(202).redirect('/LinkTree');
   res.end();
 });

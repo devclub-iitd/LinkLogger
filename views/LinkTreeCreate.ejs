@@ -33,6 +33,7 @@
               id="title1"
             />
             <div class="container" id="fields"></div>
+            <input type="hidden" value="0" name="numberOfLinks" id="numberOfLinks">
             <br />
             <button type="submit" class="m-1 btn btn-success">Submit</button>
             <button
@@ -50,6 +51,7 @@
       let count = 0;
       function addField() {
         count++;
+        document.getElementById('numberOfLinks').value = count;
         card = '';
         card += "<div class='m-1 input-group' id='field" + String(count) + "'>";
         card +=
