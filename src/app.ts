@@ -1,14 +1,13 @@
 import * as express from 'express';
 import path = require('path');
-import linktreeMap from './models/linktree';
+import linkMap from './models/link';
 
 // Create Express server.
 const app = express();
 const mongoose = require('mongoose');
 
 const dbURI =
-  'mongodb+srv://test_user:linklogging1234@linklogging.ijmqm.mongodb.net/linktree?retryWrites=true&w=majority';
-// mongodb://localhost/LinkTree --> use this for local db testing instead of dbURI
+  'mongodb+srv://test_user:linklogging1234@linklogging.ijmqm.mongodb.net/link_logging?retryWrites=true&w=majority';
 mongoose
   .connect(dbURI, {
     useNewUrlParser: true,
@@ -33,51 +32,29 @@ app.get('/', (req, res) => {
   res.send('Link Logger is Active!');
 });
 
-app.get('/LinkTree', (req, res) => {
-  res.render('LinkTree', {
-    title: 'LinkTree',
-    head: 'DevClub',
-    links: [
-      {name: 'Website', url: 'https://devclub.in/'},
-      {name: 'GitHub', url: 'https://github.com/devclub-iitd/'},
-      {
-        name: 'Recruitment',
-        url: 'https://drive.google.com/file/d/1HsUoeqMsSgESCTzvhPw9BpPWtIHfpGv6/view',
-      },
-    ],
+app.get('/link_generator', (req, res) => {
+  res.render('link_generator');
+});
+
+app.post('/link_generator', (req, res) => {
+  const original_link = req.body.original_link;
+  const short_link = req.body.short_link;
+  const link = new linkMap({
+    short_link: short_link,
+    original_link: original_link,
   });
+  link.save();
 });
 
-app.get('/LinkTree/Create', (req, res) => {
-  res.render('LinkTreeCreate');
-});
-
-app.post('/LinkTree/Create', (req, res) => {
-  try {
-    const title = req.body.title;
-    const links = [];
-    const count = req.body.numberOfLinks;
-    console.log('Count = ' + count);
-    for (let index = 1; index <= count; index++) {
-      try {
-        const link_title = eval('req.body.link_title' + index);
-        const original_link = eval('req.body.original_link' + index);
-        const link = {link_title: link_title, original_link: original_link};
-        links.push(link);
-      } catch (error) {
-        console.log('Problem sending link ' + index + ' : ' + error);
-      }
-    }
-    const linktree = new linktreeMap({
-      title: title,
-      links: links,
-    });
-    linktree.save();
-  } catch (err) {
-    console.log('Error:  ' + err);
-  }
-  res.status(202).redirect('/LinkTree');
-  res.end();
+app.get('/redirect_to/:short_link', (req, res) => {
+  const short_link = req.params.short_link;
+  linkMap.findOne({short_link: short_link}).then((result: typeof linkMap) => {
+    console.log(result);
+    const original_link = result.original_link;
+    const str = 'https://www.' + original_link;
+    res.status(301).redirect(str);
+    res.end();
+  });
 });
 
 app.set('view engine', 'ejs');
