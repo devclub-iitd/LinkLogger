@@ -7,5 +7,5 @@
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
-  ]
+, "src/middleware/auth.ts"  ]
 }

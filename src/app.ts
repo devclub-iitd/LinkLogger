@@ -1,6 +1,8 @@
 import * as express from 'express';
 import path = require('path');
 import linkMap from './models/link';
+import auth from './middleware/auth';
+const cookieParser = require('cookie-parser');
 
 // Create Express server.
 const app = express();
@@ -24,11 +26,13 @@ mongoose
 // Express configuration
 app.set('port', process.env.PORT || 5000);
 app.set('views', path.join(__dirname, '../../views'));
+app.use(cookieParser());
 
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
-app.get('/', (req, res) => {
+app.get('/', auth, (req, res) => {
+  console.log(res.locals.user);
   res.send('Link Logger is Active!');
 });
 
