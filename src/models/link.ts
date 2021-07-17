@@ -19,8 +19,8 @@ const linkSchema = new Schema(
     expiry_date: {
       type: Date,
       required: true,
-      default: () => Date.now() + 7*24*60*60*1000,
-    }
+      default: () => Date.now() + 7 * 24 * 60 * 60 * 1000,
+    },
   },
   {timestamps: true}
 );
