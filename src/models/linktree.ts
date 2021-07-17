@@ -7,26 +7,19 @@ const linktreeSchema = new Schema(
       required: true,
       // unique: true,
     },
+    users: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      }
+    ],
     links: [
       {
-        link_title: {
-          type: String,
-          required: true,
-        },
-        short_link: {
-          type: String,
-        },
-        original_link: {
-          type: String,
-          required: true,
-        },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'linkMap',
         active: {
           type: Boolean,
           default: true,
-          required: true,
-        },
-        expiry: {
-          type: Date,
         },
       },
     ],
@@ -34,5 +27,5 @@ const linktreeSchema = new Schema(
   {timestamps: true}
 );
 
-const linktreeMap = mongoose.model('LinkTree', linktreeSchema);
+const linktreeMap = mongoose.model('linktreeMap', linktreeSchema);
 export default linktreeMap;

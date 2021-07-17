@@ -1,6 +1,7 @@
 import * as express from 'express';
 import path = require('path');
 import linkMap from './models/link';
+import User from './models/user';
 import auth from './middleware/auth';
 const cookieParser = require('cookie-parser');
 
@@ -40,14 +41,28 @@ app.get('/link_generator', (req, res) => {
   res.render('link_generator');
 });
 
-app.post('/link_generator', (req, res) => {
+app.post('/link_generator', auth, (req, res) => {
+  const userData = res.locals.user;
   const original_link = req.body.original_link;
   const short_link = req.body.short_link;
+  
   const link = new linkMap({
     short_link: short_link,
     original_link: original_link,
   });
   link.save();
+
+  var query = {'username': userData.username, 'email': userData.email};
+  var update = {$addToSet: {links: link}};
+
+  // Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
+  // by default, you need to set it to false.
+  mongoose.set('useFindAndModify', false);
+  User.findOneAndUpdate(query, update, {upsert: true}, function(err: any, doc: any) {
+      if (err) return res.send(err);
+      console.log(doc);
+      return res.send('Succesfully saved.');
+  });
 });
 
 app.get('/redirect_to/:short_link', (req, res) => {
