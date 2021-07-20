@@ -65,12 +65,28 @@ app.post('/link_generator', auth, (req, res) => {
   });
 });
 
+app.get('/profile', auth, (req, res) => {
+  try {
+    const user = res.locals.user;
+    User.findOne({email: user.email}).then(async (result: typeof User) => {
+      const links_id = result.links;
+      const links: typeof linkMap[] = new Array(links_id.length);
+      for (let i = 0; i < links_id.length; i++) {
+        links[i] = await linkMap.findById(links_id[i]);
+      }
+      res.render('profile', {links: links, user: user});
+    });
+  } catch (JsonWebTokenError) {
+    res.render('<h1>Unauthorized</h1>');
+  }
+});
+
 app.get('/redirect_to/:short_link', (req, res) => {
   const short_link = req.params.short_link;
   linkMap.findOne({short_link: short_link}).then((result: typeof linkMap) => {
     console.log(result);
     const original_link = result.original_link;
-    const str = 'https://www.' + original_link;
+    const str = original_link;
     res.status(301).redirect(str);
     res.end();
   });

@@ -1,53 +1,82 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <!-- Bootstrap CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    
-        <title>Link Generator</title>
-    </head>
-    <body>
-        <header class="p-3 text-white justify-content-center bg-success">
-            <div class="d-flex justify-content-center align-items-center">
-              <div class="m-2"><h1>Create Short Link</h1></div>
-            </div>
-        </header>
-        
-        <div class="container text-center mt-4">
-            <input id="original" class='form-control m-2' type='url' placeholder='Original Link'>
-            <div class="input-group m-2">
-                <span class="input-group-text">https://dev.club/</span>
-                <input id="short" class='form-control' type='text' placeholder='Short Link'>
-            </div>
-            <button class="btn btn-primary" onclick="submit()">Save</button>
-            <div id = "status" class="alert alert-primary m-4" style="display: none;"></div>
-        </div>
-        <script>
-            function submit() {
-                let status = document.querySelector("div#status");
-                status.style.display = "none";
-                try {
-                    let original = document.querySelector('input#original').value;
-                    new URL(original); //validation
-                } catch {
-                    status.innerText = "Please enter a valid original URL";
-                    status.style.display = "block";
-                    return;
-                }
-                let short = document.querySelector('input#short').value;
-                api = new XMLHttpRequest();
-                api.open("POST","/link_generator", true);
-                api.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
-                api.onload = () => {
-                    status.innerText = api.responseText;
-                    status.style.display = "block";
-                }
-                api.send(JSON.stringify({"original_link" : original, "short_link" : short}));
-            }
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    </body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+
+    <title>Link Generator</title>
+  </head>
+  <body>
+    <header class="p-3 text-white justify-content-center bg-success">
+      <div class="d-flex justify-content-center align-items-center">
+        <div class="m-2"><h1>Create Short Link</h1></div>
+      </div>
+    </header>
+
+    <div class="container text-center mt-4">
+      <input
+        id="original"
+        class="form-control m-2"
+        type="url"
+        placeholder="Original Link"
+      />
+      <div class="input-group m-2">
+        <span class="input-group-text">https://dev.club/</span>
+        <input
+          id="short"
+          class="form-control"
+          type="text"
+          placeholder="Short Link"
+        />
+      </div>
+      <button class="btn btn-primary" onclick="submit()">Save</button>
+      <div
+        id="status"
+        class="alert alert-primary m-4"
+        style="display: none"
+      ></div>
+    </div>
+    <script>
+      function validURL(s) {
+        try {
+          let a = new URL(s);
+        } catch {
+          return false;
+        }
+        return true;
+      }
+      function submit() {
+        let status = document.querySelector('div#status');
+        status.style.display = 'none';
+        let original = document.querySelector('input#original').value;
+        if (!validURL(original)) {
+          status.innerText = 'Please enter a valid original URL';
+          status.style.display = 'block';
+          return;
+        }
+        let short = document.querySelector('input#short').value;
+        api = new XMLHttpRequest();
+        api.open('POST', '/link_generator', true);
+        api.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+        api.onload = () => {
+          status.innerText = api.responseText;
+          status.style.display = 'block';
+        };
+        api.send(JSON.stringify({original_link: original, short_link: short}));
+      }
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+  </body>
 </html>
