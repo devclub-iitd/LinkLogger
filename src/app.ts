@@ -90,7 +90,7 @@ app.get('/profile', auth, (req, res) => {
 });
 
 app.post('/profile/editLink', auth, (req, res) => {
-  const linkObj = res.locals.linkObj;
+  const linkObj = req.body.linkObj;
   //pass link[i] from frontend as linkObj
   const filter = {id: linkObj.id};
   const update = {
@@ -102,7 +102,7 @@ app.post('/profile/editLink', auth, (req, res) => {
 });
 
 app.post('/profile/deleteLink', auth, (req, res) => {
-  const linkObj = res.locals.linkObj;
+  const linkObj = req.body.linkObj;
   //pass link[i] from frontend as linkObj
   linkMap.findByIdAndDelete(linkObj.id);
 });
