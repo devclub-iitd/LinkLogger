@@ -89,6 +89,24 @@ app.get('/profile', auth, (req, res) => {
   }
 });
 
+app.post('/profile/editLink', auth, (req, res) => {
+  const linkObj = res.locals.linkObj;
+  //pass link[i] from frontend as linkObj
+  const filter = {id: linkObj.id};
+  const update = {
+    short_link: req.body.short_link,
+    original_link: req.body.original_link,
+    expiry_date: req.body.expiry_date,
+  };
+  linkMap.findOneAndUpdate(filter, update);
+});
+
+app.post('/profile/deleteLink', auth, (req, res) => {
+  const linkObj = res.locals.linkObj;
+  //pass link[i] from frontend as linkObj
+  linkMap.findByIdAndDelete(linkObj.id);
+});
+
 app.get('/redirect_to/:short_link', (req, res) => {
   const short_link = req.params.short_link;
   linkMap.findOne({short_link: short_link}).then((result: typeof linkMap) => {
