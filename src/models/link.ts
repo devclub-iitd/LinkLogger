@@ -2,15 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const linkSchema = new Schema(
   {
-    // users: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'User',
-    //   }
-    // ],
     short_link: {
       type: String,
       required: true,
+      unique: true,
     },
     original_link: {
       type: String,
@@ -21,6 +16,12 @@ const linkSchema = new Schema(
       required: true,
       default: () => Date.now() + 7 * 24 * 60 * 60 * 1000,
     },
+    // users: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'User',
+    //   }
+    // ],
   },
   {timestamps: true}
 );

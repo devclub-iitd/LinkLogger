@@ -50,19 +50,27 @@ app.post('/link_generator', auth, (req, res) => {
     short_link: short_link,
     original_link: original_link,
   });
-  link.save();
-
-  const query = {username: userData.username, email: userData.email};
-  const update = {$addToSet: {links: link}};
-
-  // Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
-  // by default, you need to set it to false.
-  mongoose.set('useFindAndModify', false);
-  User.findOneAndUpdate(query, update, {upsert: true}, (err: any, doc: any) => {
-    if (err) return res.send(err);
-    console.log(doc);
-    return res.send('Succesfully saved.');
-  });
+  link
+    .save()
+    .then((link: any) => {
+      const query = {username: userData.username, email: userData.email};
+      const update = {$addToSet: {links: link}};
+      // Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
+      // by default, you need to set it to false.
+      mongoose.set('useFindAndModify', false);
+      User.findOneAndUpdate(
+        query,
+        update,
+        {upsert: true},
+        (err: any, doc: any) => {
+          if (err) return res.send(err);
+          return res.send('Succesfully saved for ' + doc.username + '.');
+        }
+      );
+    })
+    .catch((error: any) => {
+      res.send(error.message);
+    });
 });
 
 app.get('/profile', auth, (req, res) => {

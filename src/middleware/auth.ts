@@ -38,7 +38,7 @@ interface JWTToken {
 
 // Url for handling redirects, if none is provided than the user will automatically be redirected
 // to the SSO Login Page
-const redirectURL = "";
+const redirectURL = '';
 // Array of public paths, these paths will be available without logging in and even for users that do not have sufficient permisisons
 const publicPaths = ['^/public.*', '^/asset.*', '^/$'];
 
@@ -124,7 +124,7 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
     ) {
       next();
     } else {
-      if (redirectURL !== "") res.redirect(redirectURL);
+      if (redirectURL !== '') res.redirect(redirectURL);
       else res.redirect(SSO_Login_URL + clientURL + req.originalUrl);
     }
   }
