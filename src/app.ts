@@ -2,17 +2,17 @@ import * as express from 'express';
 import path = require('path');
 import linkMap from './models/link';
 import User from './models/user';
-import linkData from './models/link_data'
+import linkData from './models/link_data';
 import auth from './middleware/auth';
-import { Request,Response } from 'express-serve-static-core';
+import {Request, Response} from 'express-serve-static-core';
 const cookieParser = require('cookie-parser');
 
 // Create Express server.
 const app = express();
 const mongoose = require('mongoose');
 
-const useragent = require('useragent')
-useragent(true)
+const useragent = require('useragent');
+useragent(true);
 
 const dbURI =
   'mongodb+srv://test_user:linklogging1234@linklogging.ijmqm.mongodb.net/link_logging?retryWrites=true&w=majority';
@@ -112,41 +112,42 @@ app.post('/profile/deleteLink', auth, (req, res) => {
   linkMap.findByIdAndDelete(linkObj.id);
 });
 
-function log_user_data(req:Request,res:Response,result:typeof linkMap){
-  const user_agent_details = useragent.parse(req.headers['user-agent'])
-  const os = user_agent_details.os.toString()
-  const device = user_agent_details.device.toString()
-  const browser = user_agent_details.toAgent()
+function log_user_data(req: Request, res: Response, result: typeof linkMap) {
+  const user_agent_details = useragent.parse(req.headers['user-agent']);
+  const os = user_agent_details.os.toString();
+  const device = user_agent_details.device.toString();
+  const browser = user_agent_details.toAgent();
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-  const referrer = req.get('Referrer') //equivalent to req.headers.referrer || req.headers.referer
-  const user_data = res.locals.user
+  const referrer = req.get('Referrer'); //equivalent to req.headers.referrer || req.headers.referer
+  const user_data = res.locals.user;
   const link_data = new linkData({
-    link:result._id,
-    operating_system:os,
-    device:device,
-    browser:browser,
-    ip:ip,
-    referrer:referrer,
-    user_data:user_data
-  })
-  link_data.save()
+    link: result._id,
+    operating_system: os,
+    device: device,
+    browser: browser,
+    ip: ip,
+    referrer: referrer,
+    user_data: user_data,
+  });
+  link_data.save();
 }
 
 app.get('/redirect_to/:short_link', auth, (req, res) => {
   const short_link = req.params.short_link;
-  linkMap.findOne({short_link: short_link})
-  .then((result: typeof linkMap) => {
-    if(!result){
-      throw new Error('Link not found')
-    }
-    log_user_data(req,res,result);
-    const original_link = result.original_link;
-    res.status(301).redirect(original_link);
-    res.end();
-  })
-  .catch(function(err:Error){
-    res.end('Link not found')
-  })
+  linkMap
+    .findOne({short_link: short_link})
+    .then((result: typeof linkMap) => {
+      if (!result) {
+        throw new Error('Link not found');
+      }
+      log_user_data(req, res, result);
+      const original_link = result.original_link;
+      res.status(301).redirect(original_link);
+      res.end();
+    })
+    .catch((err: Error) => {
+      res.end('Link not found');
+    });
 });
 
 app.set('view engine', 'ejs');
