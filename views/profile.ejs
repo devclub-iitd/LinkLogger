@@ -21,9 +21,9 @@
       </div>
     </header>
     <% for (var i=0; i<links.length ;i++) {%>
-    <div class="card text-center m-4">
-      <h4 class="card-header d-flex justify-content-around p-1">
-        <button class="btn btn-primary">
+    <div id="<%= links[i].id %>" class="card text-center m-4">
+      <h4 id="<%= links[i].id %>" class="card-header d-flex justify-content-around p-1">
+        <button id="<%= links[i].id %>" class="btn btn-primary">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
@@ -42,7 +42,7 @@
           </svg>
         </button>
         <%= links[i].short_link %>
-        <button class="btn btn-danger">
+        <button id="<%= links[i].id %>" onclick="del('<%= links[i].id %>')" class="btn btn-danger">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
@@ -57,9 +57,9 @@
           </svg>
         </button>
       </h4>
-      <div class="card-body p-1">
+      <div id="<%= links[i].id %>" class="card-body p-1">
         Original Link:
-        <a target="_blank" href="<%= links[i].original_link %>">
+        <a id="(<%= links[i].id %>" target="_blank" href="<%= links[i].original_link %>">
           <%= links[i].original_link %>
         </a>
       </div>
@@ -71,6 +71,19 @@
       </div>
     </div>
     <%}%>
+    <script>
+      function del(id) {
+        api = new XMLHttpRequest();
+        api.open('POST', '/profile/deleteLink', true);
+        api.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+        api.onload = () => {
+          if (api.status == 200) {
+            document.querySelectorAll("#"+id).forEach(e => e.outerHTML="");
+          }
+        };
+        api.send(JSON.stringify({linkObj: id}));
+      }
+    </script>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"

@@ -101,13 +101,26 @@ app.post('/profile/editLink', auth, (req, res) => {
     original_link: req.body.original_link,
     expiry_date: req.body.expiry_date,
   };
-  linkMap.findOneAndUpdate(filter, update);
+  linkMap.findOneAndUpdate(filter, update, function (err:any, docs:any) {
+    if (err) {
+      res.status(555).send(err)
+    } else {
+      res.send("Successfully edited "+docs);
+    }
+  });
 });
 
 app.post('/profile/deleteLink', auth, (req, res) => {
   const linkObj = req.body.linkObj;
+  console.log(linkObj);
   //pass link[i] from frontend as linkObj
-  linkMap.findByIdAndDelete(linkObj);
+  linkMap.findByIdAndDelete(linkObj, function (err:any, docs:any) {
+    if (err) {
+      res.status(555).send(err)
+    } else {
+      res.send("Successfully deleted "+docs);
+    }
+  });  
 });
 
 app.get('/redirect_to/:short_link', (req, res) => {
