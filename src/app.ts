@@ -31,6 +31,9 @@ app.use(cookieParser());
 
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
+// Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
+// by default, you need to set it to false.
+mongoose.set('useFindAndModify', false);
 
 app.get('/', auth, (req, res) => {
   console.log(res.locals.user);
@@ -55,9 +58,6 @@ app.post('/link_generator', auth, (req, res) => {
     .then((link: any) => {
       const query = {username: userData.username, email: userData.email};
       const update = {$addToSet: {links: link}};
-      // Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
-      // by default, you need to set it to false.
-      mongoose.set('useFindAndModify', false);
       User.findOneAndUpdate(
         query,
         update,
@@ -102,26 +102,37 @@ app.post('/profile/editLink', auth, (req, res) => {
     original_link: req.body.original_link,
    // expiry_date: req.body.expiry_date,
   };
-  linkMap.findOneAndUpdate(filter, update, function (err:any, docs:any) {
+  linkMap.findOneAndUpdate(filter, update, (err: any, docs: any) => {
     if (err) {
-      res.status(555).send(err)
+      res.status(555).send(err.message);
     } else {
-      res.send("Successfully edited "+docs);
+      res.send('Successfully edited ' + docs);
     }
   });
 });
 
 app.post('/profile/deleteLink', auth, (req, res) => {
+  const user = res.locals.user;
+  console.log('user is ' + user);
   const linkObj = req.body.linkObj;
   console.log(linkObj);
   //pass link[i] from frontend as linkObj
-  linkMap.findByIdAndDelete(linkObj, function (err:any, docs:any) {
+  linkMap.findByIdAndDelete(linkObj, (err: any, docs: any) => {
     if (err) {
-      res.status(555).send(err)
+      res.status(555).send(err);
     } else {
-      res.send("Successfully deleted "+docs);
+      res.send('Successfully deleted ' + docs);
     }
-  });  
+  });
+  const filter = {email: user.email};
+  const update = {$pull: {links: linkObj}};
+  User.findOneAndUpdate(filter, update, (err: any, docs: any) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log('Edited for user ' + docs.username);
+    }
+  });
 });
 
 app.get('/redirect_to/:short_link', (req, res) => {
