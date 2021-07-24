@@ -92,7 +92,10 @@ app.get('/profile', auth, (req, res) => {
 app.post('/profile/editLink', auth, (req, res) => {
   const linkObj = req.body.linkObj;
   //pass link[i] from frontend as linkObj
-  const filter = {id: linkObj.id};
+  //pass new shortLink from form as short_link
+  //pass new originalLink from form as original_link
+  //pass new expiryDate from form as expiry_date
+  const filter = {id: linkObj};
   const update = {
     short_link: req.body.short_link,
     original_link: req.body.original_link,
@@ -104,7 +107,7 @@ app.post('/profile/editLink', auth, (req, res) => {
 app.post('/profile/deleteLink', auth, (req, res) => {
   const linkObj = req.body.linkObj;
   //pass link[i] from frontend as linkObj
-  linkMap.findByIdAndDelete(linkObj.id);
+  linkMap.findByIdAndDelete(linkObj);
 });
 
 app.get('/redirect_to/:short_link', (req, res) => {
