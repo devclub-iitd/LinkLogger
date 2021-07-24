@@ -20,68 +20,68 @@
         <div class="m-2"><h1>Links for <%= user.username %></h1></div>
       </div>
     </header>
-    <% for (var i=0; i<links.length ;i++) {%>
+    <% for (var i=0; i < links.length ; i++) {%>
     <div id="<%= links[i].id %>" class="card text-center m-4">
-      <h4 id="<%= links[i].id %>" class="card-header d-flex justify-content-around p-1">
-        <button id="<%= links[i].id %>" class="btn btn-primary">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            fill="currentColor"
-            class="bi bi-pencil-square"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"
-            />
-            <path
-              fill-rule="evenodd"
-              d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"
-            />
-          </svg>
-        </button>
-        <%= links[i].short_link %>
-        <button id="<%= links[i].id %>" onclick="del('<%= links[i].id %>')" class="btn btn-danger">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            fill="currentColor"
-            class="bi bi-trash-fill"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"
-            />
-          </svg>
-        </button>
-      </h4>
-      <div id="<%= links[i].id %>" class="card-body p-1">
-        Original Link:
-        <a id="(<%= links[i].id %>" target="_blank" href="<%= links[i].original_link %>">
-          <%= links[i].original_link %>
-        </a>
-      </div>
-      <div class="card-footer">
+      <div class="card-header">
         <small class="text-muted">
-          Last Updated: <%=links[i].updatedAt.toLocaleString()%>. Expires on
-          <%=links[i].expiry_date.toLocaleString()%>
+          Last Updated: <%=links[i].updatedAt.toLocaleString()%> • Expires on <%=links[i].expiry_date.toLocaleString()%>
         </small>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <label class="col-sm-2 col-form-label">Short Link</label>
+          <div class="col-sm-10">
+            <input id="short_<%= links[i].id %>" readonly type="text" class="form-control" value="<%= links[i].short_link %>">
+          </div>
+        </div>
+        <div class="row mb-3">
+          <label class="col-sm-2 col-form-label">Original Link</label>
+          <div class="col-sm-10">
+            <input id="original_<%= links[i].id %>" readonly type="url" class="form-control" value="<%= links[i].original_link %>">
+          </div>
+        </div>
+        <button id="edit_<%= links[i].id %>" onclick="edit('<%= links[i].id %>')" class="btn btn-primary">
+          Edit
+        </button>
+        <button id="delete_<%= links[i].id %>" onclick="del('<%= links[i].id %>')" class="btn btn-danger">
+          Delete
+        </button>      
       </div>
     </div>
     <%}%>
     <script>
       function del(id) {
-        api = new XMLHttpRequest();
+        let api = new XMLHttpRequest();
         api.open('POST', '/profile/deleteLink', true);
         api.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
         api.onload = () => {
           if (api.status == 200) {
-            document.querySelectorAll("#"+id).forEach(e => e.outerHTML="");
+            document.querySelector("#"+id).outerHTML="";
           }
         };
         api.send(JSON.stringify({linkObj: id}));
+      }
+      function edit(id) {
+        document.querySelector("input#short_"+id).readOnly = false;
+        document.querySelector("input#original_"+id).readOnly = false;
+        document.querySelector("button#edit_"+id).innerText = "Save";
+        document.querySelector("button#edit_"+id).className = "btn btn-warning";
+        document.querySelector("button#edit_"+id).onclick = () => save(id);
+      }
+      function save(id) {
+        let short = document.querySelector("input#short_"+id);
+        let original = document.querySelector("input#original_"+id);
+        api = new XMLHttpRequest();
+        api.open('POST', '/profile/editLink', true);
+        api.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+        api.onload = () => {
+          short.readOnly=true;
+          original.readOnly=true;
+          document.querySelector("button#edit_"+id).innerText = "Edit";
+          document.querySelector("button#edit_"+id).className = "btn btn-primary";
+          document.querySelector("button#edit_"+id).onclick = () => edit(id);
+        };
+        api.send(JSON.stringify({linkObj : id, original_link: original.value, short_link: short.value}));
       }
     </script>
     <script
