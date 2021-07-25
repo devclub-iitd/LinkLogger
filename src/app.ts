@@ -92,15 +92,17 @@ app.get('/profile', auth, (req, res) => {
 app.post('/profile/editLink', auth, (req, res) => {
   const linkObj = req.body.linkObj;
   console.log(linkObj);
+  console.log(req.body.short_link);
+  console.log(req.body.original_link);
   //pass link[i] from frontend as linkObj
   //pass new shortLink from form as short_link
   //pass new originalLink from form as original_link
   //pass new expiryDate from form as expiry_date
-  const filter = {id: linkObj};
+  const filter = {_id: linkObj};
   const update = {
     short_link: req.body.short_link,
     original_link: req.body.original_link,
-   // expiry_date: req.body.expiry_date,
+    // expiry_date: req.body.expiry_date,
   };
   linkMap.findOneAndUpdate(filter, update, (err: any, docs: any) => {
     if (err) {
