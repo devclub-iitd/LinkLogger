@@ -102,13 +102,13 @@ app.post('/profile/editLink', auth, (req, res) => {
   const update = {
     short_link: req.body.short_link,
     original_link: req.body.original_link,
-    // expiry_date: req.body.expiry_date,
+    expiry_date: req.body.expiry_date,
   };
-  linkMap.findOneAndUpdate(filter, update, (err: any, docs: any) => {
+  linkMap.findOneAndUpdate(filter, update, {new: true}, (err: any, docs: any) => {
     if (err) {
-      res.status(555).send(err.message);
+      res.status(500).send(err.message);
     } else {
-      res.send('Successfully edited ' + docs);
+      res.send(docs);
     }
   });
 });
@@ -121,7 +121,7 @@ app.post('/profile/deleteLink', auth, (req, res) => {
   //pass link[i] from frontend as linkObj
   linkMap.findByIdAndDelete(linkObj, (err: any, docs: any) => {
     if (err) {
-      res.status(555).send(err);
+      res.status(500).send(err);
     } else {
       res.send('Successfully deleted ' + docs);
     }

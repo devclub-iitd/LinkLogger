@@ -24,7 +24,7 @@
     <div id="<%= links[i].id %>" class="card text-center m-4">
       <div class="card-header">
         <small class="text-muted">
-          Last Updated: <%=links[i].updatedAt.toLocaleString()%> • Expires on <%=links[i].expiry_date.toLocaleString()%>
+          Last Updated: <span id="last_<%= links[i].id %>"><%=links[i].updatedAt.toLocaleString()%></span>
         </small>
       </div>
       <div class="card-body">
@@ -38,6 +38,14 @@
           <label class="col-sm-2 col-form-label">Original Link</label>
           <div class="col-sm-10">
             <input id="original_<%= links[i].id %>" readonly type="url" class="form-control" value="<%= links[i].original_link %>">
+          </div>
+        </div>
+        <div class="row mb-3">
+          <label class="col-sm-2 col-form-label">Expires on</label>
+          <div class="col-sm-10">
+            <input id="expire_<%= links[i].id %>" readonly type="datetime-local" class="form-control" value="<%=
+             new Date(links[i].expiry_date.valueOf()-links[i].expiry_date.getTimezoneOffset()*1000*60).toISOString().split('.')[0]
+             %>"/>
           </div>
         </div>
         <button id="edit_<%= links[i].id %>" onclick="edit('<%= links[i].id %>')" class="btn btn-primary">
@@ -64,6 +72,7 @@
       function edit(id) {
         document.querySelector("input#short_"+id).readOnly = false;
         document.querySelector("input#original_"+id).readOnly = false;
+        document.querySelector("input#expire_"+id).readOnly = false;
         document.querySelector("button#edit_"+id).innerText = "Save";
         document.querySelector("button#edit_"+id).className = "btn btn-warning";
         document.querySelector("button#edit_"+id).onclick = () => save(id);
@@ -71,17 +80,20 @@
       function save(id) {
         let short = document.querySelector("input#short_"+id);
         let original = document.querySelector("input#original_"+id);
+        let expire = document.querySelector("input#expire_"+id);
         api = new XMLHttpRequest();
         api.open('POST', '/profile/editLink', true);
         api.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
         api.onload = () => {
           short.readOnly=true;
           original.readOnly=true;
+          expire.readOnly=true;
           document.querySelector("button#edit_"+id).innerText = "Edit";
           document.querySelector("button#edit_"+id).className = "btn btn-primary";
           document.querySelector("button#edit_"+id).onclick = () => edit(id);
+          document.querySelector("span#last_"+id).innerText = new Date(JSON.parse(api.response)['updatedAt']).toLocaleString();
         };
-        api.send(JSON.stringify({linkObj : id, original_link: original.value, short_link: short.value}));
+        api.send(JSON.stringify({linkObj : id, original_link: original.value, short_link: short.value, expiry_date: new Date(expire.value)}));
       }
     </script>
     <script
