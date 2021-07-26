@@ -55,20 +55,20 @@ app.post('/link_generator', auth, (req, res) => {
   });
   link
     .save()
-    .then((link: any) => {
+    .then((link: typeof linkMap) => {
       const query = {username: userData.username, email: userData.email};
       const update = {$addToSet: {links: link}};
       User.findOneAndUpdate(
         query,
         update,
         {upsert: true},
-        (err: any, doc: any) => {
+        (err: Error, doc: typeof User) => {
           if (err) return res.send(err);
           return res.send('Succesfully saved for ' + doc.username + '.');
         }
       );
     })
-    .catch((error: any) => {
+    .catch((error: Error) => {
       res.send(error.message);
     });
 });
@@ -104,13 +104,18 @@ app.post('/profile/editLink', auth, (req, res) => {
     original_link: req.body.original_link,
     expiry_date: req.body.expiry_date,
   };
-  linkMap.findOneAndUpdate(filter, update, {new: true}, (err: any, docs: any) => {
-    if (err) {
-      res.status(500).send(err.message);
-    } else {
-      res.send(docs);
+  linkMap.findOneAndUpdate(
+    filter,
+    update,
+    {new: true},
+    (err: Error, docs: typeof linkMap) => {
+      if (err) {
+        res.status(500).send(err.message);
+      } else {
+        res.send(docs);
+      }
     }
-  });
+  );
 });
 
 app.post('/profile/deleteLink', auth, (req, res) => {
@@ -119,7 +124,7 @@ app.post('/profile/deleteLink', auth, (req, res) => {
   const linkObj = req.body.linkObj;
   console.log(linkObj);
   //pass link[i] from frontend as linkObj
-  linkMap.findByIdAndDelete(linkObj, (err: any, docs: any) => {
+  linkMap.findByIdAndDelete(linkObj, (err: Error, docs: typeof linkMap) => {
     if (err) {
       res.status(500).send(err);
     } else {
@@ -128,7 +133,7 @@ app.post('/profile/deleteLink', auth, (req, res) => {
   });
   const filter = {email: user.email};
   const update = {$pull: {links: linkObj}};
-  User.findOneAndUpdate(filter, update, (err: any, docs: any) => {
+  User.findOneAndUpdate(filter, update, (err: Error, docs: typeof User) => {
     if (err) {
       console.log(err);
     } else {
