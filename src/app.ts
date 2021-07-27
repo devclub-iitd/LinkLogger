@@ -150,47 +150,56 @@ app.get('/redirect_to/:short_link', auth, (req, res) => {
     });
 });
 
-app.get('/analytics/:short_link', auth, async (req,res)=>{
-  try{
+app.get('/analytics/:short_link', auth, async (req, res) => {
+  try {
     const user = res.locals.user;
-    var link:typeof linkMap;
-    var target_id:string;
+    let link: typeof linkMap;
+    let target_id: string;
     target_id = '';
-    await linkMap.findOne({short_link:req.params.short_link},function(err:Error, result:typeof linkMap){
-      if(!(err==null)){
-        throw new Error('Error in finding link')
+    await linkMap.findOne(
+      {short_link: req.params.short_link},
+      (err: Error, result: typeof linkMap) => {
+        if (!(err == null)) {
+          throw new Error('Error in finding link');
+        }
+        if (result == null) {
+          throw new Error('No link found');
+        }
+        link = result;
       }
-      if(result==null){
-        throw new Error('No link found')
-      }
-      link = result;
-    });
-    await User.findOne({email:res.locals.user.email},function(err:Error,result:typeof User){
-      if(!(err==null)){
-        console.log(err);
-        throw new Error('Error in finding user');
-      }
-      if(result==null){
-        throw new Error('No user found')
-      }
-      const links_id = result.links;
-      for(var i=0;i<links_id.length;i++){
-        if(links_id[i].toString()==link._id.toString()){
-          target_id = link._id;
-          break;
+    );
+    await User.findOne(
+      {email: res.locals.user.email},
+      (err: Error, result: typeof User) => {
+        if (!(err == null)) {
+          console.log(err);
+          throw new Error('Error in finding user');
+        }
+        if (result == null) {
+          throw new Error('No user found');
+        }
+        const links_id = result.links;
+        for (let i = 0; i < links_id.length; i++) {
+          if (links_id[i].toString() == link._id.toString()) {
+            target_id = link._id;
+            break;
+          }
+        }
+        if (target_id == '') {
+          throw new Error('You are not authorized to view this link');
         }
       }
-      if(target_id==''){
-        throw new Error('You are not authorized to view this link')
-      }
-    });
-    await linkData.find({link:target_id}).lean().exec(function(err:Error,results:typeof linkData[]){
-      console.log(results)
-      return res.end(JSON.stringify(results));
-    });
-  } catch (err){
-    console.log(err.message)
-    res.send(err.message)
+    );
+    await linkData
+      .find({link: target_id})
+      .lean()
+      .exec((err: Error, results: typeof linkData[]) => {
+        console.log(results);
+        return res.end(JSON.stringify(results));
+      });
+  } catch (err) {
+    console.log(err.message);
+    res.send(err.message);
   }
 });
 
