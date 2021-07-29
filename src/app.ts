@@ -153,33 +153,25 @@ app.get('/redirect_to/:short_link', auth, (req, res) => {
 app.get('/analytics/:short_link', auth, async (req, res) => {
   try {
     const user = res.locals.user;
-    let link: typeof linkMap;
-    let target_id: string;
+    var link: typeof linkMap;
+    var target_id: string;
     target_id = '';
-    await linkMap.findOne(
-      {short_link: req.params.short_link},
-      (err: Error, result: typeof linkMap) => {
-        if (!(err == null)) {
-          throw new Error('Error in finding link');
-        }
+    await linkMap
+      .findOne({short_link: req.params.short_link})
+      .then((result: typeof linkMap) => {
         if (result == null) {
           throw new Error('No link found');
         }
+        console.log(result);
         link = result;
-      }
-    );
-    await User.findOne(
-      {email: res.locals.user.email},
-      (err: Error, result: typeof User) => {
-        if (!(err == null)) {
-          console.log(err);
-          throw new Error('Error in finding user');
-        }
+      });
+    await User.findOne({email: res.locals.user.email}).then(
+      (result: typeof User) => {
         if (result == null) {
           throw new Error('No user found');
         }
         const links_id = result.links;
-        for (let i = 0; i < links_id.length; i++) {
+        for (var i = 0; i < links_id.length; i++) {
           if (links_id[i].toString() == link._id.toString()) {
             target_id = link._id;
             break;
@@ -193,7 +185,7 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
     await linkData
       .find({link: target_id})
       .lean()
-      .exec((err: Error, results: typeof linkData[]) => {
+      .exec(function (err: Error, results: typeof linkData[]) {
         console.log(results);
         return res.end(JSON.stringify(results));
       });
