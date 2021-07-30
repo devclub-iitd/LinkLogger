@@ -14,6 +14,8 @@ const mongoose = require('mongoose');
 const useragent = require('useragent');
 useragent(true);
 
+const geoip = require('geoip-lite');
+
 const dbURI =
   'mongodb+srv://test_user:linklogging1234@linklogging.ijmqm.mongodb.net/link_logging?retryWrites=true&w=majority';
 mongoose
@@ -120,12 +122,22 @@ function log_user_data(req: Request, res: Response, result: typeof linkMap) {
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   const referrer = req.get('Referrer'); //equivalent to req.headers.referrer || req.headers.referer
   const user_data = res.locals.user;
+  let city: String;
+  city = '';
+  try {
+    const geo = geoip.lookup(ip);
+    console.log(geo);
+    city = geo.city;
+  } catch (err) {
+    console.log(err);
+  }
   const link_data = new linkData({
     link: result._id,
     operating_system: os,
     device: device,
     browser: browser,
     ip: ip,
+    city: city,
     referrer: referrer,
     user_data: user_data,
   });
@@ -153,8 +165,8 @@ app.get('/redirect_to/:short_link', auth, (req, res) => {
 app.get('/analytics/:short_link', auth, async (req, res) => {
   try {
     const user = res.locals.user;
-    var link: typeof linkMap;
-    var target_id: string;
+    let link: typeof linkMap;
+    let target_id: string;
     target_id = '';
     await linkMap
       .findOne({short_link: req.params.short_link})
@@ -171,7 +183,7 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
           throw new Error('No user found');
         }
         const links_id = result.links;
-        for (var i = 0; i < links_id.length; i++) {
+        for (let i = 0; i < links_id.length; i++) {
           if (links_id[i].toString() == link._id.toString()) {
             target_id = link._id;
             break;
@@ -185,7 +197,7 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
     await linkData
       .find({link: target_id})
       .lean()
-      .exec(function (err: Error, results: typeof linkData[]) {
+      .exec((err: Error, results: typeof linkData[]) => {
         console.log(results);
         return res.end(JSON.stringify(results));
       });

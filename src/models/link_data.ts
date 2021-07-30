@@ -26,6 +26,9 @@ const linkDataSchema = new Schema(
     user_data: {
       type: Object,
     },
+    city: {
+      type: String,
+    },
   },
   {timestamps: true}
 );
