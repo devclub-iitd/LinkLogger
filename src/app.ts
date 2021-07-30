@@ -123,11 +123,14 @@ function log_user_data(req: Request, res: Response, result: typeof linkMap) {
   const referrer = req.get('Referrer'); //equivalent to req.headers.referrer || req.headers.referer
   const user_data = res.locals.user;
   let city: String;
+  let coordinates: Array<Number>;
   city = '';
+  coordinates = [0, 0];
   try {
     const geo = geoip.lookup(ip);
     console.log(geo);
     city = geo.city;
+    coordinates = geo.ll;
   } catch (err) {
     console.log(err);
   }
@@ -137,6 +140,7 @@ function log_user_data(req: Request, res: Response, result: typeof linkMap) {
     device: device,
     browser: browser,
     ip: ip,
+    coordinates: coordinates,
     city: city,
     referrer: referrer,
     user_data: user_data,

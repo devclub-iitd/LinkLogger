@@ -29,6 +29,9 @@ const linkDataSchema = new Schema(
     city: {
       type: String,
     },
+    coordinates: {
+      type: [Number],
+    },
   },
   {timestamps: true}
 );
