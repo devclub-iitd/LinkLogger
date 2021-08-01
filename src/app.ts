@@ -175,7 +175,7 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
     await linkMap
       .findOne({short_link: req.params.short_link})
       .then((result: typeof linkMap) => {
-        if (result == null) {
+        if (result === null) {
           throw new Error('No link found');
         }
         console.log(result);
@@ -183,17 +183,17 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
       });
     await User.findOne({email: res.locals.user.email}).then(
       (result: typeof User) => {
-        if (result == null) {
+        if (result === null) {
           throw new Error('No user found');
         }
         const links_id = result.links;
         for (let i = 0; i < links_id.length; i++) {
-          if (links_id[i].toString() == link._id.toString()) {
+          if (links_id[i].toString() === link._id.toString()) {
             target_id = link._id;
             break;
           }
         }
-        if (target_id == '') {
+        if (target_id === '') {
           throw new Error('You are not authorized to view this link');
         }
       }
@@ -205,7 +205,59 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
         console.log(results);
         return res.end(JSON.stringify(results));
       });
-  } catch (err) {
+  } catch (err: any) {
+    console.log(err.message);
+    res.send(err.message);
+  }
+});
+
+app.get('/map/:short_link', auth, async (req, res) => {
+  res.locals.short_link = req.params.short_link;
+  const coordinates: Number[][] = [];
+  try {
+    const user = res.locals.user;
+    let link: typeof linkMap;
+    let target_id: string;
+    target_id = '';
+    await linkMap
+      .findOne({short_link: req.params.short_link})
+      .then((result: typeof linkMap) => {
+        if (result === null) {
+          throw new Error('No link found');
+        }
+        console.log(result);
+        link = result;
+      });
+    await User.findOne({email: res.locals.user.email}).then(
+      (result: typeof User) => {
+        if (result === null) {
+          throw new Error('No user found');
+        }
+        const links_id = result.links;
+        for (let i = 0; i < links_id.length; i++) {
+          if (links_id[i].toString() === link._id.toString()) {
+            target_id = link._id;
+            break;
+          }
+        }
+        if (target_id === '') {
+          throw new Error('You are not authorized to view this link');
+        }
+      }
+    );
+    await linkData
+      .find({link: target_id})
+      .lean()
+      .exec((err: Error, results: typeof linkData[]) => {
+        console.log(results);
+        // return res.end(JSON.stringify(results));
+        results.forEach(lData => {
+          coordinates.push(lData.coordinates);
+        });
+        res.locals.coordinates = coordinates;
+        res.render('map');
+      });
+  } catch (err: any) {
     console.log(err.message);
     res.send(err.message);
   }
