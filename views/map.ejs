@@ -18,6 +18,9 @@
 </head>
 <body>
     <h1>Analytics for <%= short_link %> </h1>
+    <h3><%= JSON.stringify(linkTime) %> </h3>
+    <h3><%= JSON.stringify(linkBrowser) %> </h3>
+    <h3><%= JSON.stringify(linkOS) %> </h3>
     <div id="mapid"></div>
 
 <!-- <script src="..\node_modules\leaflet-heatmap\leaflet-heatmap.js"></script> -->
@@ -61,7 +64,7 @@
     function onMapClick(e) {
         popup
             .setLatLng(e.latlng)
-            .setContent("You clicked at " + e.latlng.toString())
+            .setContent(e.latlng.toString())
             .openOn(mymap);
     }
     mymap.on('click', onMapClick);

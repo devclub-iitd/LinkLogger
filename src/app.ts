@@ -5,6 +5,7 @@ import User from './models/user';
 import linkData from './models/link_data';
 import auth from './middleware/auth';
 import {Request, Response} from 'express-serve-static-core';
+import {isAnyArrayBuffer} from 'util/types';
 const cookieParser = require('cookie-parser');
 
 // Create Express server.
@@ -127,10 +128,11 @@ function log_user_data(req: Request, res: Response, result: typeof linkMap) {
   let city: String;
   let coordinates: Array<Number>;
   city = '';
+  // eslint-disable-next-line prefer-const
   coordinates = [0, 0];
   try {
     const loc = ip2loc.IP2Location_get_all(ip);
-    if (loc == null) {
+    if (loc === null) {
       throw new Error('Unable to convert');
     } else {
       coordinates[0] = loc.latitude;
@@ -175,6 +177,16 @@ app.get('/redirect_to/:short_link', auth, (req, res) => {
 
 app.get('/analytics/:short_link', auth, async (req, res) => {
   try {
+    const countOccurrences = (arr: Array<any>) => {
+      return arr.reduce(
+        (prev: any, curr: any) => ((prev[curr] = ++prev[curr] || 1), prev),
+        {}
+      );
+    };
+    const coordinates: Number[][] = [];
+    const linkTime: String[] = [];
+    const linkOS: String[] = [];
+    const linkBrowser: String[] = [];
     const user = res.locals.user;
     let link: typeof linkMap;
     let target_id: string;
@@ -209,6 +221,18 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
       .find({link: target_id})
       .lean()
       .exec((err: Error, results: typeof linkData[]) => {
+        let linkHour;
+        results.forEach(lData => {
+          coordinates.push(lData.coordinates);
+          linkHour = lData.createdAt.toString().substring(0, 18);
+          linkTime.push(linkHour);
+          linkBrowser.push(lData.browser);
+          linkOS.push(lData.operating_system);
+        });
+        res.locals.coordinates = coordinates;
+        res.locals.linkTime = countOccurrences(linkTime);
+        res.locals.linkBrowser = countOccurrences(linkBrowser);
+        res.locals.linkOS = countOccurrences(linkOS);
         console.log(results);
         return res.end(JSON.stringify(results));
       });
@@ -220,7 +244,17 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
 
 app.get('/map/:short_link', auth, async (req, res) => {
   res.locals.short_link = req.params.short_link;
+  // countOccurences counts the frequency of each element and returns a json object with these pairs
+  const countOccurrences = (arr: Array<any>) => {
+    return arr.reduce(
+      (prev: any, curr: any) => ((prev[curr] = ++prev[curr] || 1), prev),
+      {}
+    );
+  };
   const coordinates: Number[][] = [];
+  const linkTime: String[] = [];
+  const linkOS: String[] = [];
+  const linkBrowser: String[] = [];
   try {
     const user = res.locals.user;
     let link: typeof linkMap;
@@ -258,10 +292,18 @@ app.get('/map/:short_link', auth, async (req, res) => {
       .exec((err: Error, results: typeof linkData[]) => {
         console.log(results);
         // return res.end(JSON.stringify(results));
+        let linkHour;
         results.forEach(lData => {
           coordinates.push(lData.coordinates);
+          linkHour = lData.createdAt.toString().substring(0, 18);
+          linkTime.push(linkHour);
+          linkBrowser.push(lData.browser);
+          linkOS.push(lData.operating_system);
         });
         res.locals.coordinates = coordinates;
+        res.locals.linkTime = countOccurrences(linkTime);
+        res.locals.linkBrowser = countOccurrences(linkBrowser);
+        res.locals.linkOS = countOccurrences(linkOS);
         res.render('map');
       });
   } catch (err: any) {
