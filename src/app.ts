@@ -14,7 +14,8 @@ const mongoose = require('mongoose');
 const useragent = require('useragent');
 useragent(true);
 
-const geoip = require('geoip-lite');
+const ip2loc = require('ip2location-nodejs');
+ip2loc.IP2Location_init(path.join(__dirname, '../IP_DATA.BIN'));
 
 const dbURI =
   'mongodb+srv://test_user:linklogging1234@linklogging.ijmqm.mongodb.net/link_logging?retryWrites=true&w=majority';
@@ -120,6 +121,7 @@ function log_user_data(req: Request, res: Response, result: typeof linkMap) {
   const device = user_agent_details.device.toString();
   const browser = user_agent_details.toAgent();
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  console.log(ip);
   const referrer = req.get('Referrer'); //equivalent to req.headers.referrer || req.headers.referer
   const user_data = res.locals.user;
   let city: String;
@@ -127,13 +129,18 @@ function log_user_data(req: Request, res: Response, result: typeof linkMap) {
   city = '';
   coordinates = [0, 0];
   try {
-    const geo = geoip.lookup(ip);
-    console.log(geo);
-    city = geo.city;
-    coordinates = geo.ll;
+    const loc = ip2loc.IP2Location_get_all(ip);
+    if (loc == null) {
+      throw new Error('Unable to convert');
+    } else {
+      coordinates[0] = loc.latitude;
+      coordinates[1] = loc.longitude;
+      city = loc.city;
+    }
   } catch (err) {
     console.log(err);
   }
+
   const link_data = new linkData({
     link: result._id,
     operating_system: os,
