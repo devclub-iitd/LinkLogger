@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= short_link %> </title>
+    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script> -->
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #mapid { height: 500px; width: 70% }
+    </style>
+</head>
+<body>
+    <h1>Analytics for <%= short_link %> </h1>
+    <div id="mapid"></div>
+
+<!-- <script src="..\node_modules\leaflet-heatmap\leaflet-heatmap.js"></script> -->
+<script src="https://unpkg.com/leaflet/dist/leaflet-src.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<script>
+    const mymap = L.map('mapid').setView([28.5457, 77.1928], 4);
+    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 11,
+        id: 'mapbox/streets-v11',
+        tileSize: 512,
+        zoomOffset: -1,
+        accessToken: 'pk.eyJ1Ijoia2FydGlrcmFzdG9naTU3IiwiYSI6ImNrcnFxYTBhazAxNmoydm5wd3Y0NjlhbmUifQ.eTuAk93V5hIA--zlL4ZWQA'
+    }).addTo(mymap);
+
+    <% coordinates.forEach(LatLon => { %>
+        L.heatLayer(
+        [[<%= LatLon[0] %>,<%= LatLon[1] %>, 14]],
+        {radius: 25},
+        {0.4: 'blue', 0.65: 'lime', 1: 'red'},
+        {minOpacity: 0.4}
+    ).addTo(mymap);
+    <% }) %>
+
+    const markerOptions = {
+        opacity: 0.5,
+        riseOnHover: true,
+    }
+    const marker = L.marker([28.5457, 77.1928], markerOptions).addTo(mymap);
+    // const circle = L.circle([28.5457, 77.1928], {
+    //     color: 'red',
+    //     fillColor: '#f03',
+    //     fillOpacity: 0.5,
+    //     radius: 500
+    // }).addTo(mymap);
+
+    marker.bindPopup("<b>Our Campus!</b><br>Have you seen it? :(").openPopup();
+    const popup = L.popup();
+
+    function onMapClick(e) {
+        popup
+            .setLatLng(e.latlng)
+            .setContent("You clicked at " + e.latlng.toString())
+            .openOn(mymap);
+    }
+    mymap.on('click', onMapClick);
+
+    
+</script>
+    
+</body>
+</html>
