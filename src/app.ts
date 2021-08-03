@@ -221,13 +221,15 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
       .find({link: target_id})
       .lean()
       .exec((err: Error, results: typeof linkData[]) => {
-        let linkHour;
+        let linkHour, lBrowser, lOS;
         results.forEach(lData => {
           coordinates.push(lData.coordinates);
           linkHour = lData.createdAt.toString().substring(0, 18);
+          lBrowser = lData.browser.toString();
+          lOS = lData.operating_system.toString();
           linkTime.push(linkHour);
-          linkBrowser.push(lData.browser);
-          linkOS.push(lData.operating_system);
+          linkBrowser.push(lBrowser.substring(0, lBrowser.indexOf(' ')));
+          linkOS.push(lOS.substring(0, lOS.indexOf(' ')));
         });
         res.locals.coordinates = coordinates;
         res.locals.linkTime = countOccurrences(linkTime);
@@ -292,13 +294,15 @@ app.get('/map/:short_link', auth, async (req, res) => {
       .exec((err: Error, results: typeof linkData[]) => {
         console.log(results);
         // return res.end(JSON.stringify(results));
-        let linkHour;
+        let linkHour, lBrowser, lOS;
         results.forEach(lData => {
           coordinates.push(lData.coordinates);
           linkHour = lData.createdAt.toString().substring(0, 18);
+          lBrowser = lData.browser.toString();
+          lOS = lData.operating_system.toString();
           linkTime.push(linkHour);
-          linkBrowser.push(lData.browser);
-          linkOS.push(lData.operating_system);
+          linkBrowser.push(lBrowser.substring(0, lBrowser.indexOf(' ')));
+          linkOS.push(lOS.substring(0, lOS.indexOf(' ')));
         });
         res.locals.coordinates = coordinates;
         res.locals.linkTime = countOccurrences(linkTime);
