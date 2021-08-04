@@ -221,10 +221,11 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
       .find({link: target_id})
       .lean()
       .exec((err: Error, results: typeof linkData[]) => {
-        let linkHour, lBrowser, lOS;
+        let linkHour, lBrowser, lOS, lHour;
         results.forEach(lData => {
           coordinates.push(lData.coordinates);
-          linkHour = lData.createdAt.toString().substring(0, 18);
+          lHour = lData.createdAt.toString();
+          linkHour = lHour.substring(0, 19) + ':00:00' + lHour.substring(24);
           lBrowser = lData.browser.toString();
           lOS = lData.operating_system.toString();
           linkTime.push(linkHour);
@@ -294,10 +295,11 @@ app.get('/map/:short_link', auth, async (req, res) => {
       .exec((err: Error, results: typeof linkData[]) => {
         console.log(results);
         // return res.end(JSON.stringify(results));
-        let linkHour, lBrowser, lOS;
+        let linkHour, lBrowser, lOS, lHour;
         results.forEach(lData => {
           coordinates.push(lData.coordinates);
-          linkHour = lData.createdAt.toString().substring(0, 18);
+          lHour = lData.createdAt.toString();
+          linkHour = lHour.substring(0, 19) + '00:00' + lHour.substring(24);
           lBrowser = lData.browser.toString();
           lOS = lData.operating_system.toString();
           linkTime.push(linkHour);
