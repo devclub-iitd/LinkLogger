@@ -176,17 +176,24 @@ app.get('/redirect_to/:short_link', auth, (req, res) => {
 });
 
 app.get('/analytics/:short_link', auth, async (req, res) => {
+  res.locals.short_link = req.params.short_link;
+  // trimString removes everything after a space in a string
+  function trimString(str: String) {
+    if (str.indexOf(' ') === -1) return str;
+    else return str.substring(0, str.indexOf(' '));
+  }
+  // countOccurences counts the frequency of each element and returns a json object with these pairs
+  const countOccurrences = (arr: Array<any>) => {
+    return arr.reduce(
+      (prev: any, curr: any) => ((prev[curr] = ++prev[curr] || 1), prev),
+      {}
+    );
+  };
+  const coordinates: Number[][] = [];
+  const linkTime: String[] = [];
+  const linkOS: String[] = [];
+  const linkBrowser: String[] = [];
   try {
-    const countOccurrences = (arr: Array<any>) => {
-      return arr.reduce(
-        (prev: any, curr: any) => ((prev[curr] = ++prev[curr] || 1), prev),
-        {}
-      );
-    };
-    const coordinates: Number[][] = [];
-    const linkTime: String[] = [];
-    const linkOS: String[] = [];
-    const linkBrowser: String[] = [];
     const user = res.locals.user;
     let link: typeof linkMap;
     let target_id: string;
@@ -229,8 +236,8 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
           lBrowser = lData.browser.toString();
           lOS = lData.operating_system.toString();
           linkTime.push(linkHour);
-          linkBrowser.push(lBrowser.substring(0, lBrowser.indexOf(' ')));
-          linkOS.push(lOS.substring(0, lOS.indexOf(' ')));
+          linkBrowser.push(trimString(lBrowser));
+          linkOS.push(trimString(lOS));
         });
         res.locals.coordinates = coordinates;
         res.locals.linkTime = countOccurrences(linkTime);
@@ -247,6 +254,11 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
 
 app.get('/map/:short_link', auth, async (req, res) => {
   res.locals.short_link = req.params.short_link;
+  // trimString removes everything after a space in a string
+  function trimString(str: String) {
+    if (str.indexOf(' ') === -1) return str;
+    else return str.substring(0, str.indexOf(' '));
+  }
   // countOccurences counts the frequency of each element and returns a json object with these pairs
   const countOccurrences = (arr: Array<any>) => {
     return arr.reduce(
@@ -303,8 +315,8 @@ app.get('/map/:short_link', auth, async (req, res) => {
           lBrowser = lData.browser.toString();
           lOS = lData.operating_system.toString();
           linkTime.push(linkHour);
-          linkBrowser.push(lBrowser.substring(0, lBrowser.indexOf(' ')));
-          linkOS.push(lOS.substring(0, lOS.indexOf(' ')));
+          linkBrowser.push(trimString(lBrowser));
+          linkOS.push(trimString(lOS));
         });
         res.locals.coordinates = coordinates;
         res.locals.linkTime = countOccurrences(linkTime);
