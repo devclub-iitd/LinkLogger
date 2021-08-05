@@ -166,7 +166,7 @@
     // OS chart render starts here
     const ctxOS = document.getElementById("OSChart").getContext("2d");
     const OSChart = new Chart(ctxOS, {
-        type: "polarArea",
+        type: "pie",
         data: {
             <% const OSKeys = Object.keys(linkOS) %>
 
@@ -194,11 +194,6 @@
         },
         options: {
             responsive: true,
-            scale: {
-                ticks: {
-                    fontSize: 24,
-                },
-            },
             legend: {
                 display: true,
                 labels: {
@@ -215,7 +210,7 @@
     // Browser chart render starts here
     const ctxBrowser = document.getElementById("browserChart").getContext("2d");
     const browserChart = new Chart(ctxBrowser, {
-        type: "polarArea",
+        type: "pie",
         data: {
             <% const browserKeys = Object.keys(linkBrowser) %>
 
@@ -243,11 +238,6 @@
         },
         options: {
             responsive: true,
-            scale: {
-                ticks: {
-                    fontSize: 24,
-                },
-            },
             legend: {
                 display: true,
                 labels: {
