@@ -1,60 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        <%= short_link %>
-    </title>
-    <link type="text/css" rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analytics | <%= short_link %></title>
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet/dist/leaflet.css"
+    />
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
     <style>
         #mapid {
             height: 450px;
-            width: 45%;
-            display: inline-flexbox;
-        }
-
-        .chart-container {
-            display: inline-flexbox;
-        }
-
-        #clickChart {
-            height: 350px !important;
-            width: 50% !important;
-        }
-
-        #OSChart {
-            height: 350px !important;
-            width: 50% !important;
-        }
-
-        #browserChart {
-            height: 350px !important;
-            width: 50% !important;
         }
     </style>
-</head>
+  </head>
 
-<body>
-    <h1>Analytics for <%= short_link %>
-    </h1>
-    <!-- Backend Data for testing -->
-    <h3>
-        <%= JSON.stringify(linkTime) %>
-    </h3>
-    <h3>
-        <%= JSON.stringify(linkBrowser) %>
-    </h3>
-    <h3>
-        <%= JSON.stringify(linkOS) %>
-    </h3>
-    <!-- Separate divs for Map and Charts -->
-    <div id="mapid"></div>
-    <div class="chart-container"><canvas id="clickChart"></canvas></div>
-    <div class="chart-container"><canvas id="OSChart"></canvas></div>
-    <div class="chart-container"><canvas id="browserChart"></canvas></div>
+  <body>
+    <header class="p-3 text-white justify-content-center bg-success">
+      <div class="d-flex justify-content-center align-items-center">
+        <div class="m-2"><h1>Analytics for <%= short_link %></h1></div>
+      </div>
+    </header>
+    <div class="container my-4 text-align-center">
+      <div class="row">
+        <div class="col my-2">
+          <div class="card">
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="clickChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md my-2">
+          <div class="card">
+            <div class="card-body">
+              <div class="chart-container"><canvas id="OSChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md my-2">
+          <div class="card">
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="browserChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col my-2">
+          <div class="card">
+            <div class="card-body p-0">
+              <div id="mapid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Scripts for Map -->
     <script src="https://unpkg.com/leaflet/dist/leaflet-src.js"></script>
@@ -74,15 +89,13 @@
             zoomOffset: -1,
             accessToken: 'pk.eyJ1Ijoia2FydGlrcmFzdG9naTU3IiwiYSI6ImNrcnFxYTBhazAxNmoydm5wd3Y0NjlhbmUifQ.eTuAk93V5hIA--zlL4ZWQA'
         }).addTo(mymap);
-
     <% coordinates.forEach(LatLon => { %>
-            L.heatLayer(
-                [[<%= LatLon[0] %>,<%= LatLon[1] %>, 14]],
-                { radius: 25 },
-                { 0.4: 'blue', 0.65: 'lime', 1: 'red' },
-                { minOpacity: 0.4 }
-            ).addTo(mymap);
-    <% }) %>
+        L.heatLayer(
+            [[<%= LatLon[0] %>,<%= LatLon[1] %>, 14]],
+            { radius: 25 },
+            { 0.4: 'blue', 0.65: 'lime', 1: 'red' },
+            { minOpacity: 0.4 }
+        ).addTo(mymap);<% }) %>
 
     const markerOptions = {
         opacity: 0.5,
@@ -122,17 +135,18 @@
                 pointHoverRadius: 8,
                 data: [
                 <% const timeKeys = Object.keys(linkTime) %>
-                <% timeKeys.forEach(timeKey => { %>
-                {
+                <% timeKeys.forEach(timeKey => { %>{
                     t: "<%= timeKey %>",
                     y: <%= linkTime[timeKey] %>   
-                    },
+                },
                 <% }) %>
                 ],
             }],
         },
         options: {
             responsive: true,
+            maintainAspectRatio : true,
+            aspectRatio: 2,
             scales: {
                 xAxes: [{
                     type: 'time',
@@ -140,25 +154,25 @@
                         unit: 'hour',
                     },
                     ticks: {
-                        fontSize: 24,
+                        fontSize: 16,
                     },
                 }],
                 yAxes: [{
                     ticks: {
                         beginAtZero: true,
-                        fontSize: 24,
+                        fontSize: 16,
                     },
                 }],
             },
             legend: {
                 display: true,
                 labels: {
-                    fontSize: 28
+                    fontSize: 20
                 },
             },
             tooltips: {
-                titleFontSize: 24,
-                bodyFontSize: 26,
+                titleFontSize: 14,
+                bodyFontSize: 12,
             }
         },
     });
@@ -166,14 +180,12 @@
     // OS chart render starts here
     const ctxOS = document.getElementById("OSChart").getContext("2d");
     const OSChart = new Chart(ctxOS, {
-        type: "pie",
+        type: "doughnut",
         data: {
             <% const OSKeys = Object.keys(linkOS) %>
 
-            labels: [
-                <% OSKeys.forEach(OSKey => { %>
-                    "<%= OSKey %>",
-                <% }) %>
+            labels: [<% OSKeys.forEach(OSKey => { %>
+                "<%= OSKey %>",<% }) %>
             ],
             datasets: [{
                 backgroundColor: [
@@ -185,24 +197,24 @@
                 "#95a5a6",
                 "#34495e"
                 ],
-                data: [
-                <% OSKeys.forEach(OSKey => { %>
-                    <%= linkOS[OSKey] %>,
-                <% }) %>
+                data: [<% OSKeys.forEach(OSKey => { %>
+                    <%= linkOS[OSKey] %>, <% }) %>
                 ],
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio : true,
+            aspectRatio: 1.5,
             legend: {
                 display: true,
                 labels: {
-                    fontSize: 28
+                    fontSize: 20
                 },
             },
             tooltips: {
-                titleFontSize: 24,
-                bodyFontSize: 26,
+                titleFontSize: 14,
+                bodyFontSize: 12,
             }
         },
     });
@@ -210,14 +222,11 @@
     // Browser chart render starts here
     const ctxBrowser = document.getElementById("browserChart").getContext("2d");
     const browserChart = new Chart(ctxBrowser, {
-        type: "pie",
+        type: "doughnut",
         data: {
             <% const browserKeys = Object.keys(linkBrowser) %>
-
-            labels: [
-                <% browserKeys.forEach(browserKey => { %>
-                    "<%= browserKey %>",
-                <% }) %>
+            labels: [<% browserKeys.forEach(browserKey => { %>
+                "<%= browserKey %>",<% }) %>
             ],
             datasets: [{
                 backgroundColor: [
@@ -229,30 +238,35 @@
                 "#95a5a6",
                 "#34495e"
                 ],
-                data: [
-                <% browserKeys.forEach(browserKey => { %>
-                    <%= linkBrowser[browserKey] %>,
-                <% }) %>
+                data: [<% browserKeys.forEach(browserKey => { %>
+                    <%= linkBrowser[browserKey] %>,<% }) %>
                 ],
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio : true,
+            aspectRatio: 1.5,
             legend: {
                 display: true,
                 labels: {
-                    fontSize: 28
+                    fontSize: 20
                 },
             },
             tooltips: {
-                titleFontSize: 24,
-                bodyFontSize: 26,
+                titleFontSize: 14,
+                bodyFontSize: 12,
             }
         },
     });
     // Browser chart render ends here
     </script>
-
+ <script
+ src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+ integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+ crossorigin="anonymous"
+></script>
+</body>
 </body>
 
 </html>
