@@ -158,6 +158,8 @@
           type: 'time',
           ticks: {
             fontSize: 16,
+            autoSkip: true,
+            autoSkipPadding: 50,
           },
         }],
         yAxes: [{
@@ -187,9 +189,9 @@
       },
     },
   });
-  function resetZoomChart() {
-    timeChart.resetZoom();
-  }
+    function resetZoomChart() {
+      timeChart.resetZoom();
+    }
     // Click-time chart render ends here
     // OS chart render starts here
     const ctxOS = document.getElementById("OSChart").getContext("2d");
