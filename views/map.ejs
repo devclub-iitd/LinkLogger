@@ -1,105 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Analytics | <%= short_link %></title>
-    <link
-      type="text/css"
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet/dist/leaflet.css"
-    />
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-      crossorigin="anonymous"
-    />
-    <style>
-        #mapid {
-            height: 450px;
-        }
-    </style>
-  </head>
 
-  <body>
-    <header class="p-3 text-white justify-content-center bg-success">
-      <div class="d-flex justify-content-center align-items-center">
-        <div class="m-2"><h1>Analytics for <%= short_link %></h1></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analytics | <%= short_link %>
+  </title>
+  <link type="text/css" rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+  <style>
+    #mapid {
+      height: 450px;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="p-3 text-white justify-content-center bg-success">
+    <div class="d-flex justify-content-center align-items-center">
+      <div class="m-2">
+        <h1>Analytics for <%= short_link %>
+        </h1>
       </div>
-    </header>
-    <div class="container my-4 text-align-center">
-      <div class="row">
-        <div class="col my-2">
-          <div class="card">
-            <div class="card-body">
-              <div class="chart-container">
-                <canvas id="clickChart"></canvas>
-              </div>
+    </div>
+  </header>
+  <div class="container my-4 text-align-center">
+    <div class="row">
+      <div class="col my-2">
+        <div class="card">
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="clickChart"></canvas>
             </div>
+            <button onclick="resetZoomChart()">Reset Zoom</button>
           </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md my-2">
-          <div class="card">
-            <div class="card-body">
-              <div class="chart-container"><canvas id="OSChart"></canvas></div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md my-2">
-          <div class="card">
-            <div class="card-body">
-              <div class="chart-container">
-                <canvas id="browserChart"></canvas>
-              </div>
-            </div>
+    </div>
+    <div class="row">
+      <div class="col-md my-2">
+        <div class="card">
+          <div class="card-body">
+            <div class="chart-container"><canvas id="OSChart"></canvas></div>
           </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col my-2">
-          <div class="card">
-            <div class="card-body p-0">
-              <div id="mapid"></div>
+      <div class="col-md my-2">
+        <div class="card">
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="browserChart"></canvas>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <div class="row">
+      <div class="col my-2">
+        <div class="card">
+          <div class="card-body p-0">
+            <div id="mapid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <!-- Scripts for Map -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet-src.js"></script>
-    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
-    <!-- Scripts for Charts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
-    <!-- Main Script for Rendering Objects -->
-    <script>
+  <!-- Scripts for Map -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet-src.js"></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  <!-- Scripts for Charts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"
+    integrity="sha512-UXumZrZNiOwnTcZSHLOfcTs0aos2MzBWHXOHOuB0J/R44QB0dwY5JgfbvljXcklVf65Gc4El6RjZ+lnwd2az2g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/0.7.7/chartjs-plugin-zoom.min.js"
+    integrity="sha512-8E9fPF4pjWxI0dpprpn4WYeciAMo2kh6xN0COFxvTfurMttjZzih/sBp+Fxu49Zr6IUSp4sqWY6KLecnqOCwxA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- Main Script for Rendering Objects -->
+  <script>
     // Map render starts here
     const mymap = L.map('mapid').setView([28.5457, 77.1928], 4);
-        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            maxZoom: 11,
-            id: 'mapbox/streets-v11',
-            tileSize: 512,
-            zoomOffset: -1,
-            accessToken: 'pk.eyJ1Ijoia2FydGlrcmFzdG9naTU3IiwiYSI6ImNrcnFxYTBhazAxNmoydm5wd3Y0NjlhbmUifQ.eTuAk93V5hIA--zlL4ZWQA'
-        }).addTo(mymap);
-    <% coordinates.forEach(LatLon => { %>
-        L.heatLayer(
-            [[<%= LatLon[0] %>,<%= LatLon[1] %>, 14]],
-            { radius: 25 },
-            { 0.4: 'blue', 0.65: 'lime', 1: 'red' },
-            { minOpacity: 0.4 }
-        ).addTo(mymap);<% }) %>
+    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+      maxZoom: 11,
+      id: 'mapbox/streets-v11',
+      tileSize: 512,
+      zoomOffset: -1,
+      accessToken: 'pk.eyJ1Ijoia2FydGlrcmFzdG9naTU3IiwiYSI6ImNrcnFxYTBhazAxNmoydm5wd3Y0NjlhbmUifQ.eTuAk93V5hIA--zlL4ZWQA'
+    }).addTo(mymap);
+      <% coordinates.forEach(LatLon => { %>
+      L.heatLayer(
+        [[<%= LatLon[0] %>,<%= LatLon[1] %>, 14]],
+        { radius: 25 },
+        { 0.4: 'blue', 0.65: 'lime', 1: 'red' },
+        { minOpacity: 0.4 }
+      ).addTo(mymap);<% }) %>
 
-    const markerOptions = {
-        opacity: 0.5,
-        riseOnHover: true,
+      const markerOptions = {
+      opacity: 0.5,
+      riseOnHover: true,
     }
     const marker = L.marker([28.5457, 77.1928], markerOptions).addTo(mymap);
 
@@ -107,166 +111,173 @@
     const popup = L.popup();
 
     function onMapClick(e) {
-        popup
-            .setLatLng(e.latlng)
-            .setContent(e.latlng.toString())
-            .openOn(mymap);
+      popup
+        .setLatLng(e.latlng)
+        .setContent(e.latlng.toString())
+        .openOn(mymap);
     }
     mymap.on('click', onMapClick);
     // Map render ends here
     // Click-time chart render starts here
     const ctxTime = document.getElementById('clickChart').getContext('2d');
+    // </block>
+    const panStatus = () => zoomOptions.pan.enabled ? 'enabled' : 'disabled';
+    const zoomStatus = () => zoomOptions.zoom.wheel.enabled ? 'enabled' : 'disabled';
 
     const timeChart = new Chart(ctxTime, {
-        type: 'line',
-        maintainAspectRatio: false,
-        responsive: true,
-        data: {
-            datasets: [{
-                label: 'Visits',
-                // fill: false,
-                labelSize: 8,
-                backgroundColor: "rgba(255, 166, 0, 0.3)",
-                borderColor: "rgba(255, 166, 0, 1)",
-                borderWidth: 8,
-                pointBackgroundColor: "#bc5090",
-                pointBorderColor: "rgba(41, 128, 185, 0)",
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                data: [
-                <% const timeKeys = Object.keys(linkTime) %>
-                <% timeKeys.forEach(timeKey => { %>{
-                    t: "<%= timeKey %>",
-                    y: <%= linkTime[timeKey] %>   
-                },
-                <% }) %>
-                ],
-            }],
+      type: 'line',
+      responsive: true,
+      data: {
+        datasets: [{
+          label: 'Visits',
+          // fill: false,
+          labelSize: 8,
+          backgroundColor: "rgba(255, 166, 0, 0.3)",
+          borderColor: "rgba(255, 166, 0, 1)",
+          borderWidth: 8,
+          pointBackgroundColor: "#bc5090",
+          pointBorderColor: "rgba(41, 128, 185, 0)",
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          data: [
+                  <% const timeKeys = Object.keys(linkTime) %>
+                  <% timeKeys.forEach(timeKey => { %> {
+            t: "<%= timeKey %>",
+            y: <%= linkTime[timeKey] %>
+                  },
+                  <% }) %>
+            ],
+      }],
+    },
+      options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 2,
+      scales: {
+        xAxes: [{
+          type: 'time',
+          ticks: {
+            fontSize: 16,
+          },
+        }],
+        yAxes: [{
+          ticks: {
+            beginAtZero: true,
+            fontSize: 16,
+          },
+        }],
+      },
+      legend: {
+        display: true,
+        labels: {
+          fontSize: 20
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio : true,
-            aspectRatio: 2,
-            scales: {
-                xAxes: [{
-                    type: 'time',
-                    time: {
-                        unit: 'hour',
-                    },
-                    ticks: {
-                        fontSize: 16,
-                    },
-                }],
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true,
-                        fontSize: 16,
-                    },
-                }],
-            },
-            legend: {
-                display: true,
-                labels: {
-                    fontSize: 20
-                },
-            },
-            tooltips: {
-                titleFontSize: 14,
-                bodyFontSize: 12,
-            }
-        },
-    });
+      },
+      tooltips: {
+        titleFontSize: 14,
+        bodyFontSize: 12,
+      },
+      pan: {
+        enabled: true,
+        mode: 'x',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'x',
+      },
+    },
+  });
+  function resetZoomChart() {
+    timeChart.resetZoom();
+  }
     // Click-time chart render ends here
     // OS chart render starts here
     const ctxOS = document.getElementById("OSChart").getContext("2d");
     const OSChart = new Chart(ctxOS, {
-        type: "doughnut",
-        data: {
-            <% const OSKeys = Object.keys(linkOS) %>
+      type: "doughnut",
+      data: {
+              <% const OSKeys = Object.keys(linkOS) %>
 
-            labels: [<% OSKeys.forEach(OSKey => { %>
-                "<%= OSKey %>",<% }) %>
-            ],
-            datasets: [{
-                backgroundColor: [
-                "#2ecc71",
-                "#3498db",
-                "#9b59b6",
-                "#f1c40f",
-                "#e74c3c",
-                "#95a5a6",
-                "#34495e"
-                ],
-                data: [<% OSKeys.forEach(OSKey => { %>
-                    <%= linkOS[OSKey] %>, <% }) %>
-                ],
-            }]
+        labels: [<% OSKeys.forEach(OSKey => { %>
+          "<%= OSKey %>",<% }) %>
+              ],
+      datasets: [{
+        backgroundColor: [
+          "#2ecc71",
+          "#3498db",
+          "#9b59b6",
+          "#f1c40f",
+          "#e74c3c",
+          "#95a5a6",
+          "#34495e"
+        ],
+        data: [<% OSKeys.forEach(OSKey => { %>
+                      <%= linkOS[OSKey] %>, <% }) %>
+                  ],
+      }]
+    },
+      options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 1.5,
+      legend: {
+        display: true,
+        labels: {
+          fontSize: 20
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio : true,
-            aspectRatio: 1.5,
-            legend: {
-                display: true,
-                labels: {
-                    fontSize: 20
-                },
-            },
-            tooltips: {
-                titleFontSize: 14,
-                bodyFontSize: 12,
-            }
-        },
+      },
+      tooltips: {
+        titleFontSize: 14,
+        bodyFontSize: 12,
+      },
+    },
     });
     // OS chart render ends here
     // Browser chart render starts here
     const ctxBrowser = document.getElementById("browserChart").getContext("2d");
     const browserChart = new Chart(ctxBrowser, {
-        type: "doughnut",
-        data: {
-            <% const browserKeys = Object.keys(linkBrowser) %>
-            labels: [<% browserKeys.forEach(browserKey => { %>
-                "<%= browserKey %>",<% }) %>
-            ],
-            datasets: [{
-                backgroundColor: [
-                "#2ecc71",
-                "#3498db",
-                "#9b59b6",
-                "#f1c40f",
-                "#e74c3c",
-                "#95a5a6",
-                "#34495e"
-                ],
-                data: [<% browserKeys.forEach(browserKey => { %>
-                    <%= linkBrowser[browserKey] %>,<% }) %>
-                ],
-            }]
+      type: "doughnut",
+      data: {
+              <% const browserKeys = Object.keys(linkBrowser) %>
+        labels: [<% browserKeys.forEach(browserKey => { %>
+          "<%= browserKey %>",<% }) %>
+              ],
+      datasets: [{
+        backgroundColor: [
+          "#2ecc71",
+          "#3498db",
+          "#9b59b6",
+          "#f1c40f",
+          "#e74c3c",
+          "#95a5a6",
+          "#34495e"
+        ],
+        data: [<% browserKeys.forEach(browserKey => { %>
+                      <%= linkBrowser[browserKey] %>,<% }) %>
+                  ],
+      }]
+    },
+      options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 1.5,
+      legend: {
+        display: true,
+        labels: {
+          fontSize: 20
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio : true,
-            aspectRatio: 1.5,
-            legend: {
-                display: true,
-                labels: {
-                    fontSize: 20
-                },
-            },
-            tooltips: {
-                titleFontSize: 14,
-                bodyFontSize: 12,
-            }
-        },
+      },
+      tooltips: {
+        titleFontSize: 14,
+        bodyFontSize: 12,
+      },
+    },
     });
-    // Browser chart render ends here
-    </script>
- <script
- src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
- integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
- crossorigin="anonymous"
-></script>
-</body>
+      // Browser chart render ends here
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
 </body>
 
 </html>
