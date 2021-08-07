@@ -16,6 +16,10 @@ const linkSchema = new Schema(
       required: true,
       default: () => Date.now() + 7 * 24 * 60 * 60 * 1000,
     },
+    is_in_tree: {
+      type: Boolean,
+      default: false
+    }
     // users: [
     //   {
     //     type: mongoose.Schema.Types.ObjectId,

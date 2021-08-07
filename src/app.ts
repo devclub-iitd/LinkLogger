@@ -3,6 +3,7 @@ import path = require('path');
 import linkMap from './models/link';
 import User from './models/user';
 import linkData from './models/link_data';
+import linktreeMap from './models/linktree';
 import auth from './middleware/auth';
 import {Request, Response} from 'express-serve-static-core';
 import {isAnyArrayBuffer} from 'util/types';
@@ -175,7 +176,7 @@ app.get('/redirect_to/:short_link', auth, (req, res) => {
     });
 });
 
-app.get('/analytics/:short_link', auth, async (req, res) => {
+app.get('/analytics/:short_link', auth, async (req, res) => { 
   res.locals.short_link = req.params.short_link;
   // trimString removes everything after a space in a string
   function trimString(str: String) {
@@ -328,6 +329,73 @@ app.get('/map/:short_link', auth, async (req, res) => {
     console.log(err.message);
     res.send(err.message);
   }
+});
+
+app.get('/LinkTree', (req, res) => {
+  res.render('LinkTree', {
+    title: 'LinkTree',
+    head: 'DevClub',
+    links: [
+      {name: 'Website', url: 'https://devclub.in/'},
+      {name: 'GitHub', url: 'https://github.com/devclub-iitd/'},
+      {
+        name: 'Recruitment',
+        url: 'https://drive.google.com/file/d/1HsUoeqMsSgESCTzvhPw9BpPWtIHfpGv6/view',
+      },
+    ],
+  });
+});
+
+app.get('/LinkTree/Create', (req, res) => {
+  res.render('LinkTreeCreate');
+});
+
+app.post('/LinkTree/Create',auth, async (req, res) => {
+  try {
+    const title = req.body.title;
+    const links = [];
+    const userData = res.locals.user;
+    const count = req.body.numberOfLinks;
+    console.log('Count = ' + count);
+    for (let index = 1; index <= count; index++) {
+      try {
+        const link_title = eval('req.body.link_title' + index);
+        const original_link = eval('req.body.original_link' + index);
+        // const link = {link_title: link_title, original_link: original_link};
+        const link = new linkMap({
+          short_link: link_title,
+          original_link: original_link,
+          is_in_tree: true
+        });
+        link.save()
+        links.push(link);
+      } catch (error) {
+        console.log('Problem sending link ' + index + ' : ' + error);
+      }
+    }
+    const linktree = new linktreeMap({
+      title: title,
+      links: links,
+    });
+    await linktree.save().then((linktree:any)=>{
+      const query = {username: userData.username, email: userData.email};
+      const update = {$addToSet: {linktrees: linktree}};
+      mongoose.set('useFindAndModify', false);
+      User.findOneAndUpdate(
+        query,
+        update,
+        {upsert: true},
+        (err: any, doc: any) => {
+          if (err) return res.send(err);
+          return res.send('Succesfully saved for ' + doc.username + '.');
+        }
+      );
+    });
+  } catch (err) {
+    console.log('Error:  ' + err);
+  }
+  // res.status(202).redirect('/LinkTree');
+  // res.end();
 });
 
 app.set('view engine', 'ejs');
