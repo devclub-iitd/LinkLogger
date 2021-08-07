@@ -6,7 +6,6 @@ import linkData from './models/link_data';
 import linktreeMap from './models/linktree';
 import auth from './middleware/auth';
 import {Request, Response} from 'express-serve-static-core';
-import {isAnyArrayBuffer} from 'util/types';
 const cookieParser = require('cookie-parser');
 
 // Create Express server.
@@ -183,7 +182,7 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
     if (str.indexOf(' ') === -1) return str;
     else return str.substring(0, str.indexOf(' '));
   }
-  // countOccurences counts the frequency of each element and returns a json object with these pairs
+  // countOccurences counts the frequency of each element and returns a json object with element-count pairs
   const countOccurrences = (arr: Array<any>) => {
     return arr.reduce(
       (prev: any, curr: any) => ((prev[curr] = ++prev[curr] || 1), prev),
@@ -195,7 +194,6 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
   const linkOS: String[] = [];
   const linkBrowser: String[] = [];
   try {
-    const user = res.locals.user;
     let link: typeof linkMap;
     let target_id: string;
     target_id = '';
@@ -229,85 +227,6 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
       .find({link: target_id})
       .lean()
       .exec((err: Error, results: typeof linkData[]) => {
-        let linkHour, lBrowser, lOS, lHour;
-        results.forEach(lData => {
-          coordinates.push(lData.coordinates);
-          lHour = lData.createdAt.toString();
-          linkHour = lHour.substring(0, 19) + ':00:00' + lHour.substring(24);
-          lBrowser = lData.browser.toString();
-          lOS = lData.operating_system.toString();
-          linkTime.push(linkHour);
-          linkBrowser.push(trimString(lBrowser));
-          linkOS.push(trimString(lOS));
-        });
-        res.locals.coordinates = coordinates;
-        res.locals.linkTime = countOccurrences(linkTime);
-        res.locals.linkBrowser = countOccurrences(linkBrowser);
-        res.locals.linkOS = countOccurrences(linkOS);
-        console.log(results);
-        return res.end(JSON.stringify(results));
-      });
-  } catch (err: any) {
-    console.log(err.message);
-    res.send(err.message);
-  }
-});
-
-app.get('/map/:short_link', auth, async (req, res) => {
-  res.locals.short_link = req.params.short_link;
-  // trimString removes everything after a space in a string
-  function trimString(str: String) {
-    if (str.indexOf(' ') === -1) return str;
-    else return str.substring(0, str.indexOf(' '));
-  }
-  // countOccurences counts the frequency of each element and returns a json object with these pairs
-  const countOccurrences = (arr: Array<any>) => {
-    return arr.reduce(
-      (prev: any, curr: any) => ((prev[curr] = ++prev[curr] || 1), prev),
-      {}
-    );
-  };
-  const coordinates: Number[][] = [];
-  const linkTime: String[] = [];
-  const linkOS: String[] = [];
-  const linkBrowser: String[] = [];
-  try {
-    const user = res.locals.user;
-    let link: typeof linkMap;
-    let target_id: string;
-    target_id = '';
-    await linkMap
-      .findOne({short_link: req.params.short_link})
-      .then((result: typeof linkMap) => {
-        if (result === null) {
-          throw new Error('No link found');
-        }
-        console.log(result);
-        link = result;
-      });
-    await User.findOne({email: res.locals.user.email}).then(
-      (result: typeof User) => {
-        if (result === null) {
-          throw new Error('No user found');
-        }
-        const links_id = result.links;
-        for (let i = 0; i < links_id.length; i++) {
-          if (links_id[i].toString() === link._id.toString()) {
-            target_id = link._id;
-            break;
-          }
-        }
-        if (target_id === '') {
-          throw new Error('You are not authorized to view this link');
-        }
-      }
-    );
-    await linkData
-      .find({link: target_id})
-      .lean()
-      .exec((err: Error, results: typeof linkData[]) => {
-        console.log(results);
-        // return res.end(JSON.stringify(results));
         let linkHour, lBrowser, lOS, lHour;
         results.forEach(lData => {
           coordinates.push(lData.coordinates);
@@ -323,7 +242,8 @@ app.get('/map/:short_link', auth, async (req, res) => {
         res.locals.linkTime = countOccurrences(linkTime);
         res.locals.linkBrowser = countOccurrences(linkBrowser);
         res.locals.linkOS = countOccurrences(linkOS);
-        res.render('map');
+        console.log(results);
+        res.render('analytics');
       });
   } catch (err: any) {
     console.log(err.message);
@@ -396,6 +316,55 @@ app.post('/LinkTree/Create', auth, async (req, res) => {
   }
   // res.status(202).redirect('/LinkTree');
   // res.end();
+});
+
+app.get('/LinkTree/:link_tree', auth, async (req, res) => {
+  res.locals.short_link = req.params.short_link;
+  try {
+    const user = res.locals.user;
+    console.log(req.params.link_tree);
+    let linktree: typeof linktreeMap;
+    let target_id: string;
+    let links_id;
+    let links: typeof linkMap[];
+    target_id = '';
+    await linktreeMap
+      .findOne({title: req.params.link_tree})
+      .then(async (result: typeof linktreeMap) => {
+        if (result === null) {
+          throw new Error('No linktree found');
+        }
+        console.log(result);
+        linktree = result;
+        links_id = linktree.links;
+        links = new Array(links_id.length);
+        for (let i = 0; i < links_id.length; i++) {
+          links[i] = await linkMap.findById(links_id[i]);
+        }
+        console.log(links);
+      });
+    await User.findOne({email: res.locals.user.email}).then(
+      (result: typeof User) => {
+        if (result === null) {
+          throw new Error('No user found');
+        }
+        const linktrees_id = result.linktrees;
+        for (let i = 0; i < linktrees_id.length; i++) {
+          if (linktrees_id[i].toString() === linktree._id.toString()) {
+            target_id = linktree._id;
+            break;
+          }
+        }
+        if (target_id === '') {
+          throw new Error('You are not authorized to view this linktree');
+        }
+        res.render('tree', {links: links, user: user, linktree: linktree});
+      }
+    );
+  } catch (err: any) {
+    console.log(err.message);
+    res.send(err.message);
+  }
 });
 
 app.set('view engine', 'ejs');

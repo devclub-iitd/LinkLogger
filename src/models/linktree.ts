@@ -5,14 +5,8 @@ const linktreeSchema = new Schema(
     title: {
       type: String,
       required: true,
-      // unique: true,
+      unique: true,
     },
-    users: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-      },
-    ],
     links: [
       {
         type: mongoose.Schema.Types.ObjectId,
