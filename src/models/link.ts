@@ -18,8 +18,8 @@ const linkSchema = new Schema(
     },
     is_in_tree: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
     // users: [
     //   {
     //     type: mongoose.Schema.Types.ObjectId,

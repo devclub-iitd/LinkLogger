@@ -176,7 +176,7 @@ app.get('/redirect_to/:short_link', auth, (req, res) => {
     });
 });
 
-app.get('/analytics/:short_link', auth, async (req, res) => { 
+app.get('/analytics/:short_link', auth, async (req, res) => {
   res.locals.short_link = req.params.short_link;
   // trimString removes everything after a space in a string
   function trimString(str: String) {
@@ -350,7 +350,7 @@ app.get('/LinkTree/Create', (req, res) => {
   res.render('LinkTreeCreate');
 });
 
-app.post('/LinkTree/Create',auth, async (req, res) => {
+app.post('/LinkTree/Create', auth, async (req, res) => {
   try {
     const title = req.body.title;
     const links = [];
@@ -365,9 +365,9 @@ app.post('/LinkTree/Create',auth, async (req, res) => {
         const link = new linkMap({
           short_link: link_title,
           original_link: original_link,
-          is_in_tree: true
+          is_in_tree: true,
         });
-        link.save()
+        link.save();
         links.push(link);
       } catch (error) {
         console.log('Problem sending link ' + index + ' : ' + error);
@@ -377,7 +377,7 @@ app.post('/LinkTree/Create',auth, async (req, res) => {
       title: title,
       links: links,
     });
-    await linktree.save().then((linktree:any)=>{
+    await linktree.save().then((linktree: any) => {
       const query = {username: userData.username, email: userData.email};
       const update = {$addToSet: {linktrees: linktree}};
       mongoose.set('useFindAndModify', false);
