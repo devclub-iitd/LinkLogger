@@ -251,19 +251,27 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
   }
 });
 
-app.get('/LinkTree', (req, res) => {
-  res.render('LinkTree', {
-    title: 'LinkTree',
-    head: 'DevClub',
-    links: [
-      {name: 'Website', url: 'https://devclub.in/'},
-      {name: 'GitHub', url: 'https://github.com/devclub-iitd/'},
-      {
-        name: 'Recruitment',
-        url: 'https://drive.google.com/file/d/1HsUoeqMsSgESCTzvhPw9BpPWtIHfpGv6/view',
-      },
-    ],
-  });
+app.get('/LinkTree', auth, async (req, res) => {
+  const links: {name: string; url: string}[] = [];
+  await User.findOne({email: res.locals.user.email})
+    .populate('linktrees')
+    .exec((err: Error, result: typeof User) => {
+      console.log(result);
+      result.linktrees.forEach((linktree: typeof linktreeMap) => {
+        const link = {
+          name: linktree.title,
+          url: `http://localhost:${app.get('port')}/LinkTree/${linktree.title}`,
+        };
+        console.log(link);
+        links.push(link);
+      });
+      console.log(links);
+      res.render('LinkTree', {
+        title: 'LinkTree',
+        head: `Linktrees for ${res.locals.user.username}`,
+        links: links,
+      });
+    });
 });
 
 app.get('/LinkTree/Create', (req, res) => {
