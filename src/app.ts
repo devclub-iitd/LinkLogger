@@ -111,9 +111,27 @@ app.post('/profile/editLink', auth, (req, res) => {
 });
 
 app.post('/profile/deleteLink', auth, (req, res) => {
+  const user = res.locals.user;
+  console.log('user is ' + user);
   const linkObj = req.body.linkObj;
+  console.log(linkObj);
   //pass link[i] from frontend as linkObj
-  linkMap.findByIdAndDelete(linkObj.id);
+  linkMap.findByIdAndDelete(linkObj, (err: Error, docs: typeof linkMap) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.send('Successfully deleted ' + docs);
+    }
+  });
+  const filter = {email: user.email};
+  const update = {$pull: {links: linkObj}};
+  User.findOneAndUpdate(filter, update, (err: Error, docs: typeof User) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log('Edited for user ' + docs.username);
+    }
+  });
 });
 
 function log_user_data(req: Request, res: Response, result: typeof linkMap) {
