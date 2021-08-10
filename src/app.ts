@@ -208,9 +208,11 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
     );
   };
   const coordinates: Number[][] = [];
-  const linkTime: String[] = [];
+  const linkTime: string[] = [];
   const linkOS: String[] = [];
   const linkBrowser: String[] = [];
+  let startDate = new Date(),
+    endDate = new Date();
   try {
     let link: typeof linkMap;
     let target_id: string;
@@ -246,16 +248,30 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
       .lean()
       .exec((err: Error, results: typeof linkData[]) => {
         let linkHour, lBrowser, lOS, lHour;
+        let AtleastOne: Boolean = true;
         results.forEach(lData => {
           coordinates.push(lData.coordinates);
-          lHour = lData.createdAt.toString();
-          linkHour = lHour.substring(0, 19) + '00:00' + lHour.substring(24);
+          if (AtleastOne) startDate = lData.createdAt;
+          AtleastOne = false;
+          endDate = lData.createdAt;
+          lHour = JSON.stringify(lData.createdAt);
+          linkHour = lHour.substring(1, 15) + '00:00.000Z';
           lBrowser = lData.browser.toString();
           lOS = lData.operating_system.toString();
           linkTime.push(linkHour);
           linkBrowser.push(trimString(lBrowser));
           linkOS.push(trimString(lOS));
         });
+        startDate.setMinutes(30, 0, 0);
+        endDate.setMinutes(30, 0, 0);
+        for (
+          let d = new Date(startDate);
+          d <= endDate;
+          d.setTime(d.getTime() + 60 * 60 * 1000)
+        ) {
+          linkTime.push(JSON.stringify(new Date(d)).substring(1, 25));
+        }
+        linkTime.sort();
         res.locals.coordinates = coordinates;
         res.locals.linkTime = countOccurrences(linkTime);
         res.locals.linkBrowser = countOccurrences(linkBrowser);
