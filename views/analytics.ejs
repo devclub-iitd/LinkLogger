@@ -132,6 +132,7 @@
       data: {
         datasets: [{
           label: 'Visits',
+          tension: 0.18,
           // fill: false,
           labelSize: 8,
           backgroundColor: "rgba(255, 166, 0, 0.3)",
@@ -145,7 +146,7 @@
                   <% const timeKeys = Object.keys(linkTime) %>
                   <% timeKeys.forEach(timeKey => { %> {
             t: "<%= timeKey %>",
-            y: <%= linkTime[timeKey]-1 %>
+            y: <%= linkTime[timeKey] %>
                   },
                   <% }) %>
             ],

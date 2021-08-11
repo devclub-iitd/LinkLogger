@@ -6,6 +6,7 @@ import linkData from './models/link_data';
 import linktreeMap from './models/linktree';
 import auth from './middleware/auth';
 import {Request, Response} from 'express-serve-static-core';
+import {strictEqual} from 'assert';
 const cookieParser = require('cookie-parser');
 
 // Create Express server.
@@ -221,12 +222,13 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
       {}
     );
   };
+  function addHoursToDate(date: Date, hours: number): Date {
+    return new Date(new Date(date).setHours(date.getHours() + hours));
+  }
   const coordinates: Number[][] = [];
   const linkTime: string[] = [];
   const linkOS: String[] = [];
   const linkBrowser: String[] = [];
-  let startDate = new Date(),
-    endDate = new Date();
   try {
     let link: typeof linkMap;
     let target_id: string;
@@ -262,12 +264,8 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
       .lean()
       .exec((err: Error, results: typeof linkData[]) => {
         let linkHour, lBrowser, lOS, lHour;
-        let AtleastOne: Boolean = true;
         results.forEach(lData => {
           coordinates.push(lData.coordinates);
-          if (AtleastOne) startDate = lData.createdAt;
-          AtleastOne = false;
-          endDate = lData.createdAt;
           lHour = JSON.stringify(lData.createdAt);
           linkHour = lHour.substring(1, 15) + '00:00.000Z';
           lBrowser = lData.browser.toString();
@@ -276,21 +274,32 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
           linkBrowser.push(trimString(lBrowser));
           linkOS.push(trimString(lOS));
         });
-        startDate.setMinutes(30, 0, 0);
-        endDate.setMinutes(30, 0, 0);
-        for (
-          let d = new Date(startDate);
-          d <= endDate;
-          d.setTime(d.getTime() + 60 * 60 * 1000)
-        ) {
-          linkTime.push(JSON.stringify(new Date(d)).substring(1, 25));
-        }
         linkTime.sort();
+        const linkTimeCount = countOccurrences(linkTime);
+        const timeKeys = Object.keys(linkTimeCount);
+        timeKeys.forEach(timeKey => {
+          const nextHr = JSON.stringify(
+            addHoursToDate(new Date(timeKey), 1)
+          ).substring(1, 25);
+          if (!timeKeys.includes(nextHr)) {
+            linkTimeCount[nextHr] = 0;
+          }
+          const prevHr = JSON.stringify(
+            addHoursToDate(new Date(timeKey), -1)
+          ).substring(1, 25);
+          if (!timeKeys.includes(prevHr)) {
+            linkTimeCount[prevHr] = 0;
+          }
+        });
+        const keysSorted = Object.keys(linkTimeCount).sort();
+        const serializedTime: {[x: string]: number} = {};
+        keysSorted.forEach(timeKey => {
+          serializedTime[timeKey] = linkTimeCount[timeKey];
+        });
         res.locals.coordinates = coordinates;
-        res.locals.linkTime = countOccurrences(linkTime);
+        res.locals.linkTime = serializedTime;
         res.locals.linkBrowser = countOccurrences(linkBrowser);
         res.locals.linkOS = countOccurrences(linkOS);
-        console.log(results);
         res.render('analytics');
       });
   } catch (err: any) {
