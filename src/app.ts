@@ -139,7 +139,9 @@ app.post('/log_linktree', async (req, res) => {
   console.log('in log_linktree');
   let link: typeof linkMap;
   let link_id: String;
+  // eslint-disable-next-line prefer-const
   link_id = req.body.link_id;
+  // eslint-disable-next-line prefer-const
   link = await linkMap.findById(link_id);
   log_user_data(req, res, link);
   res.json(link);
