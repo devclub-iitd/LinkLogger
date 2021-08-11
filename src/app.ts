@@ -134,7 +134,8 @@ app.post('/profile/deleteLink', auth, (req, res) => {
   });
 });
 
-app.post('/log_linktree', auth, async (req, res) => {
+//app.post('/log_linktree', auth, async (req, res) => {
+app.post('/log_linktree', async (req, res) => {
   console.log('in log_linktree');
   let link: typeof linkMap;
   let link_id: String;
