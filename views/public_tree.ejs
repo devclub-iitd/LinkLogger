@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+
+    <title> <%= linktree.title %>  </title>
+  </head>
+  <body>
+    <header class="p-3 text-white justify-content-center bg-success">
+      <div class="d-flex justify-content-center align-items-center">
+        <div class="m-2"><h1><%= linktree.title %></h1></div>
+      </div>
+    </header>
+    <% for (var i=0; i < links.length ; i++) {%>
+        <button type="button" class="btn btn-link" onclick='log_and_redirect("<%= links[i].id %>")'>
+            <%= links[i].short_link %>
+        </button>
+    <%}%>
+    <script>
+      function log_and_redirect(link_id){
+          let api = new XMLHttpRequest();
+          api.open('POST','/log_linktree',true);
+          api.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+          api.onload = () => {
+            let res = JSON.parse(api.response);
+            window.location = res.original_link;
+          }
+          api.send(JSON.stringify({link_id:link_id}));
+      }
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

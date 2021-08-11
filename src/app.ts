@@ -134,6 +134,17 @@ app.post('/profile/deleteLink', auth, (req, res) => {
   });
 });
 
+app.post('/log_linktree', auth, async (req,res)=>{
+  console.log('in log_linktree');
+  let link:typeof linkMap;
+  let link_id:String;
+  link_id = req.body.link_id; 
+  link = await linkMap.findById(link_id);
+  log_user_data(req,res,link);
+  res.json(link);
+  res.end()
+})
+
 function log_user_data(req: Request, res: Response, result: typeof linkMap) {
   const user_agent_details = useragent.parse(req.headers['user-agent']);
   const os = user_agent_details.os.toString();
@@ -408,6 +419,28 @@ app.get('/LinkTree/:link_tree', auth, async (req, res) => {
     res.send(err.message);
   }
 });
+
+app.get('/public_tree/:linktree_title', async (req,res)=>{
+  //fetch the linktree, display set of links, log user data on clicking a link
+  let linktree: typeof linktreeMap;
+  let links_id;
+  let links: typeof linkMap[];
+  await linktreeMap
+    .findOne({title:req.params.linktree_title})
+    .then(async (result:typeof linktreeMap)=>{
+      if (result === null) {
+        throw new Error('No linktree found');
+      }
+      linktree = result
+      links_id = linktree.links
+      links = new Array(links_id.length)
+      for(let i=0;i<links_id.length;i++){
+        links[i] = await linkMap.findById(links_id[i])
+      }
+      res.render('public_tree',{links:links,linktree:linktree})
+    });
+  
+})
 
 app.set('view engine', 'ejs');
 
