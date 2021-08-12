@@ -1,78 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-      crossorigin="anonymous"
-    />
 
-    <title>LinkTree Generator</title>
-  </head>
-  <body>
-    <header class="p-3 text-white justify-content-center bg-success">
-      <div class="d-flex justify-content-center align-items-center">
-        <div class="m-2"><h1>Create LinkTree</h1></div>
-      </div>
-    </header>
-    <div class="container">
-      <div class="row text-center m-3 row-cols-md-1">
-        <div class="col">
-          <form method="POST">
-            <input
-              required
-              type="text"
-              name="title"
-              placeholder="Tree Title"
-              class="m-2 form-control form-control-lg text-center fw-bold"
-              id="title1"
-            />
-            <div class="container" id="fields"></div>
-            <input type="hidden" value="0" name="numberOfLinks" id="numberOfLinks">
-            <br />
-            <button type="submit" class="m-1 btn btn-success">Submit</button>
-            <button
-              type="button"
-              class="m-2 btn btn-primary"
-              onclick="addField()"
-            >
-              +
-            </button>
-          </form>
-        </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+
+  <title>LinkTree Generator</title>
+</head>
+
+<body>
+  <header class="p-3 text-white justify-content-center bg-success">
+    <div class="d-flex justify-content-center align-items-center">
+      <div class="m-2">
+        <h1>Create LinkTree</h1>
       </div>
     </div>
-    <script>
-      let count = 0;
-      function addField() {
-        count++;
-        document.getElementById('numberOfLinks').value = count;
-        card = '';
-        card += "<div class='m-1 input-group' id='field" + String(count) + "'>";
-        card +=
-          "<button type='button' class='btn btn-danger' onclick=removeField(" +
-          String(count) +
-          ')>X</button>';
-        card +=
-          "<input required type='text' name='link_title" +
-          String(count) +
-          "' placeholder='Link Title' class='form-control'>";
-        card +=
-          "<input required type='url' name='original_link" +
-          String(count) +
-          "' placeholder='Link URL' class='form-control'>";
-        card += '</div>';
-        document.getElementById('fields').innerHTML += card;
+  </header>
+  <div class="container">
+    <div class="row text-center m-3 row-cols-md-1">
+      <div class="col">
+        <div id="readroot" class="m-1 input-group" style="display: none">
+          <button type="button" class="btn btn-danger"
+            onclick="this.parentNode.parentNode.removeChild(this.parentNode);">X</button>
+          <input required="" type="text" name="link_title" placeholder="Link Title" class="form-control">
+          <input required="" type="url" name="original_link" placeholder="Link URL" class="form-control">
+        </div>
+        <form method="POST">
+          <input required type="text" name="title" placeholder="Tree Title"
+            class="m-2 form-control form-control-lg text-center fw-bold" id="title1" />
+          <span id="writeroot"></span>
+          <input type="hidden" value="0" name="numberOfLinks" id="numberOfLinks">
+          <button type="submit" class="m-1 btn btn-success">Submit</button>
+          <button type="button" class="m-2 btn btn-primary" onclick="moreFields()">
+            +
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    var counter = 0;
+
+    function moreFields() {
+      counter++;
+      document.getElementById('numberOfLinks').value = counter;
+      var newFields = document.getElementById('readroot').cloneNode(true);
+      newFields.id = '';
+      newFields.style.display = 'flex';
+      var newField = newFields.childNodes;
+      for (var i = 0; i < newField.length; i++) {
+        var theName = newField[i].name
+        if (theName)
+          newField[i].name = theName + counter;
+        console.log(newField[i]);
       }
-      function removeField(i) {
-        document.getElementById('field' + String(i)).outerHTML = '';
-      }
-      addField();
-    </script>
-  </body>
+      var insertHere = document.getElementById('writeroot');
+      insertHere.parentNode.insertBefore(newFields, insertHere);
+    }
+
+    window.onload = moreFields;
+  </script>
+</body>
+
 </html>
