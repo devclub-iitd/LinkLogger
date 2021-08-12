@@ -6,7 +6,6 @@ import linkData from './models/link_data';
 import linktreeMap from './models/linktree';
 import auth from './middleware/auth';
 import {Request, Response} from 'express-serve-static-core';
-import {strictEqual} from 'assert';
 const cookieParser = require('cookie-parser');
 
 // Create Express server.
@@ -52,7 +51,7 @@ app.get('/link_generator', (req, res) => {
 });
 
 app.post('/link_generator', auth, (req, res) => {
-  const userData = res.locals.user;
+  const user = res.locals.user;
   const original_link = req.body.original_link;
   const short_link = req.body.short_link;
   //have to add user id to users array in link also
@@ -63,7 +62,7 @@ app.post('/link_generator', auth, (req, res) => {
   link
     .save()
     .then((link: any) => {
-      const query = {username: userData.username, email: userData.email};
+      const query = {username: user.username, email: user.email};
       const update = {$addToSet: {links: link}};
       // Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
       // by default, you need to set it to false.
@@ -74,7 +73,7 @@ app.post('/link_generator', auth, (req, res) => {
         {upsert: true},
         (err: any, doc: any) => {
           if (err) return res.send(err);
-          return res.send('Succesfully saved for ' + doc.username + '.');
+          return res.status(202).redirect('/profile');
         }
       );
     })
@@ -86,7 +85,8 @@ app.post('/link_generator', auth, (req, res) => {
 app.get('/profile', auth, (req, res) => {
   try {
     const user = res.locals.user;
-    User.findOne({email: user.email}).then(async (result: typeof User) => {
+    const query = {username: user.username, email: user.email};
+    User.findOne(query, {upsert: true}).then(async (result: typeof User) => {
       const links_id = result.links;
       const links: typeof linkMap[] = new Array(links_id.length);
       for (let i = 0; i < links_id.length; i++) {
@@ -119,9 +119,9 @@ app.post('/profile/deleteLink', auth, (req, res) => {
   //pass link[i] from frontend as linkObj
   linkMap.findByIdAndDelete(linkObj, (err: Error, docs: typeof linkMap) => {
     if (err) {
-      res.status(500).send(err);
+      res.status(500).send(err.message);
     } else {
-      res.send('Successfully deleted ' + docs);
+      res.send('Successfully deleted ' + docs.short_link);
     }
   });
   const filter = {email: user.email};
@@ -134,7 +134,6 @@ app.post('/profile/deleteLink', auth, (req, res) => {
     }
   });
 });
-
 //app.post('/log_linktree', auth, async (req, res) => {
 app.post('/log_linktree', async (req, res) => {
   console.log('in log_linktree');
@@ -198,12 +197,17 @@ app.get('/redirect_to/:short_link', auth, (req, res) => {
       if (!result) {
         throw new Error('Link not found');
       }
-      log_user_data(req, res, result);
-      const original_link = result.original_link;
-      res.status(301).redirect(original_link);
-      res.end();
+      if (!result.is_in_tree) {
+        log_user_data(req, res, result);
+        const original_link = result.original_link;
+        res.status(301).redirect(original_link);
+        res.end();
+      } else {
+        res.status(404).send('Visit LinkTree');
+      }
     })
     .catch((err: Error) => {
+      console.log(err.message);
       res.end('Link not found');
     });
 });
@@ -338,49 +342,54 @@ app.get('/LinkTree/Create', (req, res) => {
 app.post('/LinkTree/Create', auth, async (req, res) => {
   try {
     const title = req.body.title;
-    const links = [];
+    const links: any[] = [];
     const userData = res.locals.user;
     const count = req.body.numberOfLinks;
     console.log('Count = ' + count);
     for (let index = 1; index <= count; index++) {
-      try {
-        const link_title = eval('req.body.link_title' + index);
-        const original_link = eval('req.body.original_link' + index);
-        // const link = {link_title: link_title, original_link: original_link};
-        const link = new linkMap({
-          short_link: link_title,
-          original_link: original_link,
-          is_in_tree: true,
-        });
-        link.save();
-        links.push(link);
-      } catch (error) {
-        console.log('Problem sending link ' + index + ' : ' + error);
-      }
+      const link_title = eval('req.body.link_title' + index);
+      const original_link = eval('req.body.original_link' + index);
+      // const link = {link_title: link_title, original_link: original_link};
+      const link = new linkMap({
+        short_link: link_title,
+        original_link: original_link,
+        is_in_tree: true,
+      });
+      await link
+        .save()
+        .then((link: any) => {
+          console.log('link', link);
+          links.push(link);
+        })
+        .catch((err: any) =>
+          console.log('err while saving: ' + index, err.message)
+        );
     }
     const linktree = new linktreeMap({
       title: title,
       links: links,
     });
-    await linktree.save().then((linktree: any) => {
-      const query = {username: userData.username, email: userData.email};
-      const update = {$addToSet: {linktrees: linktree}};
-      mongoose.set('useFindAndModify', false);
-      User.findOneAndUpdate(
-        query,
-        update,
-        {upsert: true},
-        (err: any, doc: any) => {
-          if (err) return res.send(err);
-          return res.send('Succesfully saved for ' + doc.username + '.');
-        }
-      );
-    });
+    await linktree
+      .save()
+      .then((linktree: any) => {
+        const query = {username: userData.username, email: userData.email};
+        const update = {$addToSet: {linktrees: linktree}};
+        mongoose.set('useFindAndModify', false);
+        User.findOneAndUpdate(
+          query,
+          update,
+          {upsert: true},
+          (err: any, doc: any) => {
+            if (err) return res.send(err);
+            console.log('Succesfully saved for ' + doc.username + '.');
+            return res.status(202).redirect(`/LinkTree/${title}`);
+          }
+        );
+      })
+      .catch((err: any) => res.send(err.message));
   } catch (err) {
     console.log('Error:  ' + err);
   }
-  // res.status(202).redirect('/LinkTree');
-  // res.end();
 });
 
 app.get('/LinkTree/:link_tree', auth, async (req, res) => {
@@ -430,6 +439,64 @@ app.get('/LinkTree/:link_tree', auth, async (req, res) => {
     console.log(err.message);
     res.send(err.message);
   }
+});
+
+app.post('/LinkTree/:linktree/deleteLink', auth, (req, res) => {
+  const user = res.locals.user;
+  console.log('user is ' + user);
+  const linktree_title = req.params.linktree;
+  console.log('linktree is' + linktree_title);
+  const linkObj = req.body.linkObj;
+  console.log(linkObj);
+  //pass link[i] from frontend as linkObj
+  linkMap.findByIdAndDelete(linkObj, (err: Error, docs: typeof linkMap) => {
+    if (err) {
+      res.status(500).send(err.message);
+    } else {
+      res.send('Successfully deleted ' + docs.short_link);
+    }
+  });
+  const filter = {title: linktree_title};
+  const update = {$pull: {links: linkObj}};
+  linktreeMap.findOneAndUpdate(
+    filter,
+    update,
+    (err: Error, docs: typeof User) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log('Edited for linktree ' + docs.title);
+      }
+    }
+  );
+});
+
+app.post('/LinkTree/:linktree/add_link', auth, (req, res) => {
+  const linktree_title = req.params.linktree;
+  const original_link = req.body.original_link;
+  const short_link = req.body.short_link;
+  //have to add user id to users array in link also
+  const link = new linkMap({
+    short_link: short_link,
+    original_link: original_link,
+    is_in_tree: true,
+  });
+  link
+    .save()
+    .then((link: any) => {
+      const query = {title: linktree_title};
+      const update = {$addToSet: {links: link}};
+      // Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
+      // by default, you need to set it to false.
+      mongoose.set('useFindAndModify', false);
+      linktreeMap.findOneAndUpdate(query, update, (err: any, doc: any) => {
+        if (err) return res.send(err.message);
+        console.log('Updated linktree ' + doc.title);
+      });
+    })
+    .catch((error: any) => {
+      res.send(error.message);
+    });
 });
 
 app.get('/public_tree/:linktree_title', async (req, res) => {
