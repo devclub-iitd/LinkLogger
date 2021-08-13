@@ -6,6 +6,7 @@ import linkData from './models/link_data';
 import linktreeMap from './models/linktree';
 import auth from './middleware/auth';
 import {Request, Response} from 'express-serve-static-core';
+import {AnyARecord} from 'dns';
 const cookieParser = require('cookie-parser');
 
 // Create Express server.
@@ -418,6 +419,66 @@ app.get('/LinkTree/:link_tree', auth, async (req, res) => {
   } catch (err: any) {
     console.log(err.message);
     res.send(err.message);
+  }
+});
+
+app.get('/Linktree/:link_tree/delete', auth, async (req, res) => {
+  //check if linktree belongs to this user => delete links, linktree and linktree id from user object
+  try {
+    console.log('deleting linktree');
+    const user = res.locals.user;
+    let linktree_id: string;
+    let linktrees_id;
+    linktree_id = '';
+    let linktree: typeof linktreeMap;
+    let user_check = 0;
+    let links_id;
+    //check if linktree belongs to this user
+    await User.findOne({email: user.email}).then(
+      async (result: typeof User) => {
+        //console.log(result);
+        if (result === null) {
+          throw new Error('No user found');
+        }
+        linktrees_id = result.linktrees;
+        console.log(linktrees_id);
+        for (var i = 0; i < linktrees_id.length; i++) {
+          linktree = await linktreeMap
+            .findById(mongoose.Types.ObjectId(linktrees_id[i].toString()))
+            .exec();
+          if (!(linktree == null)) {
+            if (linktree.title == req.params.link_tree) {
+              user_check = 1;
+              console.log(linktree);
+              linktree_id = linktree._id;
+              break;
+            }
+          }
+        }
+        if (user_check == 0) {
+          throw new Error('Unauthorized access');
+        }
+      }
+    );
+    console.log(linktree);
+    links_id = linktree.links;
+    for (let i = 0; i < links_id.length; i++) {
+      await linkMap.findOneAndDelete({
+        _id: mongoose.Types.ObjectId(links_id[i].toString()),
+      });
+    }
+    await linktreeMap.findOneAndDelete({
+      _id: mongoose.Types.ObjectId(linktree_id.toString()),
+    });
+    const user_query = {username: user.username, email: user.email};
+    const update = {$pull: {linktrees: linktree_id}};
+    mongoose.set('useFindAndModify', false);
+    User.findOneAndUpdate(user_query, update, (err: any, doc: any) => {
+      if (err) return res.send(err);
+      return res.send('Successfully deleted linktree');
+    });
+  } catch (err) {
+    console.log(err);
   }
 });
 
