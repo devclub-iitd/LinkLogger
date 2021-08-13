@@ -60,7 +60,7 @@
     <script>
       function del(id) {
         let api = new XMLHttpRequest();
-        api.open('POST', '/profile/deleteLink', true);
+        api.open('POST', '/LinkTree/<%= linktree.title %>/deleteLink', true);
         api.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
         api.onload = () => {
           if (api.status == 200) {
