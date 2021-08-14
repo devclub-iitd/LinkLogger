@@ -47,8 +47,8 @@ app.get('/', auth, (req, res) => {
   res.send('Link Logger is Active!');
 });
 
-app.get('/link_generator', (req, res) => {
-  res.render('link_generator');
+app.get('/link_generator', auth, (req, res) => {
+  res.render('link_generator', {user: res.locals.user});
 });
 
 app.post('/link_generator', auth, (req, res) => {
@@ -305,7 +305,7 @@ app.get('/analytics/:short_link', auth, async (req, res) => {
         res.locals.linkTime = serializedTime;
         res.locals.linkBrowser = countOccurrences(linkBrowser);
         res.locals.linkOS = countOccurrences(linkOS);
-        res.render('analytics');
+        res.render('analytics', {user: res.locals.user});
       });
   } catch (err: any) {
     console.log(err.message);
@@ -332,12 +332,13 @@ app.get('/LinkTree', auth, async (req, res) => {
         title: 'LinkTree',
         head: `Linktrees for ${res.locals.user.username}`,
         links: links,
+        user: res.locals.user
       });
     });
 });
 
-app.get('/LinkTree/Create', (req, res) => {
-  res.render('LinkTreeCreate');
+app.get('/LinkTree/Create', auth, (req, res) => {
+  res.render('LinkTreeCreate', {user: res.locals.user});
 });
 
 app.post('/LinkTree/Create', auth, async (req, res) => {

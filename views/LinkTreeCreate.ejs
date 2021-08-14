@@ -13,6 +13,15 @@
 </head>
 
 <body>
+<nav class="navbar navbar-dark bg-dark">
+  <div class="container">
+    <a href="/link_generator"><button class="btn btn-primary">New Link</button></a>
+    <a href="/LinkTree/Create"><button class="btn btn-primary active">New LinkTree</button></a>
+    <a href="/profile"><button class="btn btn-primary">Manage Links</button></a>
+    <a href="/LinkTree"><button class="btn btn-primary">Manage LinkTrees</button></a>
+    <a href="http://localhost:8000/"><button class="btn btn-secondary">Logged in as <%= user.username%> </button></a>
+  </div>
+</nav>
   <header class="p-3 text-white justify-content-center bg-success">
     <div class="d-flex justify-content-center align-items-center">
       <div class="m-2">
