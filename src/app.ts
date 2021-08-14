@@ -6,7 +6,6 @@ import linkData from './models/link_data';
 import linktreeMap from './models/linktree';
 import auth from './middleware/auth';
 import {Request, Response} from 'express-serve-static-core';
-import {AnyARecord} from 'dns';
 const cookieParser = require('cookie-parser');
 
 // Create Express server.
@@ -100,16 +99,26 @@ app.get('/profile', auth, (req, res) => {
   }
 });
 
-app.post('/profile/editLink', auth, (req, res) => {
+app.post('/profile/editLink', auth, async (req, res) => {
   const linkObj = req.body.linkObj;
   //pass link[i] from frontend as linkObj
-  const filter = {id: linkObj.id};
+  const filter = {_id: linkObj};
   const update = {
     short_link: req.body.short_link,
     original_link: req.body.original_link,
     expiry_date: req.body.expiry_date,
   };
-  linkMap.findOneAndUpdate(filter, update);
+  // Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
+  // by default, you need to set it to false.
+  mongoose.set('useFindAndModify', false);
+  await linkMap
+    .findOneAndUpdate(filter, update, {new: true})
+    .then((doc: typeof linkMap, err: Error) => {
+      if (err) console.log('err: ' + err);
+      else {
+        console.log('doc: ' + doc);
+      }
+    });
 });
 
 app.post('/profile/deleteLink', auth, (req, res) => {
@@ -118,7 +127,7 @@ app.post('/profile/deleteLink', auth, (req, res) => {
   const linkObj = req.body.linkObj;
   console.log(linkObj);
   //pass link[i] from frontend as linkObj
-  linkMap.findByIdAndDelete(linkObj, (err: Error, docs: typeof linkMap) => {
+  linkMap.findByIdAndDelete(linkObj, (docs: typeof linkMap, err: Error) => {
     if (err) {
       res.status(500).send(err.message);
     } else {
@@ -332,7 +341,7 @@ app.get('/LinkTree', auth, async (req, res) => {
         title: 'LinkTree',
         head: `Linktrees for ${res.locals.user.username}`,
         links: links,
-        user: res.locals.user
+        user: res.locals.user,
       });
     });
 });
@@ -463,12 +472,12 @@ app.get('/Linktree/:link_tree/delete', auth, async (req, res) => {
         }
         linktrees_id = result.linktrees;
         console.log(linktrees_id);
-        for (var i = 0; i < linktrees_id.length; i++) {
+        for (let i = 0; i < linktrees_id.length; i++) {
           linktree = await linktreeMap
             .findById(mongoose.Types.ObjectId(linktrees_id[i].toString()))
             .exec();
-          if (!(linktree == null)) {
-            if (linktree.title == req.params.link_tree) {
+          if (!(linktree === null)) {
+            if (linktree.title === req.params.link_tree) {
               user_check = 1;
               console.log(linktree);
               linktree_id = linktree._id;
@@ -476,12 +485,13 @@ app.get('/Linktree/:link_tree/delete', auth, async (req, res) => {
             }
           }
         }
-        if (user_check == 0) {
+        if (user_check === 0) {
           throw new Error('Unauthorized access');
         }
       }
     );
     console.log(linktree);
+    // eslint-disable-next-line prefer-const
     links_id = linktree.links;
     for (let i = 0; i < links_id.length; i++) {
       await linkMap.findOneAndDelete({
@@ -530,6 +540,18 @@ app.post('/LinkTree/:linktree/deleteLink', auth, (req, res) => {
       }
     }
   );
+});
+
+app.post('/LinkTree/:linktree/editLink', auth, (req, res) => {
+  const linkObj = req.body.linkObj;
+  //pass link[i] from frontend as linkObj
+  const filter = {id: linkObj.id};
+  const update = {
+    short_link: req.body.short_link,
+    original_link: req.body.original_link,
+    expiry_date: req.body.expiry_date,
+  };
+  linkMap.findOneAndUpdate(filter, update);
 });
 
 app.post('/LinkTree/:linktree/add_link', auth, (req, res) => {
