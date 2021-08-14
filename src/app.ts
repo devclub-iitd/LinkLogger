@@ -87,7 +87,7 @@ app.get('/profile', auth, (req, res) => {
   try {
     const user = res.locals.user;
     const query = {username: user.username, email: user.email};
-    User.findOne(query, {upsert: true}).then(async (result: typeof User) => {
+    User.findOne(query).then(async (result: typeof User) => {
       const links_id = result.links;
       const links: typeof linkMap[] = new Array(links_id.length);
       for (let i = 0; i < links_id.length; i++) {

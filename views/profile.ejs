@@ -62,7 +62,12 @@
         </button>
         <button id="delete_<%= links[i].id %>" onclick="del('<%= links[i].id %>')" class="btn btn-danger">
           Delete
-        </button>      
+        </button>
+        <a href = "/analytics/<%= links[i].short_link %>">
+          <button id="analytics_<%= links[i].id %>" class="btn btn-info text-white">
+            Analytics
+          </button>
+        </a>
       </div>
     </div>
     <%}%>
