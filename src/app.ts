@@ -67,15 +67,15 @@ app.post('/link_generator', auth, (req, res) => {
       // Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
       // by default, you need to set it to false.
       mongoose.set('useFindAndModify', false);
-      User.findOneAndUpdate(
-        query,
-        update,
-        {upsert: true},
-        (err: any, doc: any) => {
-          if (err) return res.send(err);
-          return res.status(202).redirect('/profile');
+      User.findOneAndUpdate(query, update, (err: any, doc: any) => {
+        if (err) {
+          console.log('err: ' + err);
+          res.send(err.message);
+        } else {
+          console.log('doc: ' + doc);
+          res.status(200).send('Link added for ' + user.username);
         }
-      );
+      });
     })
     .catch((error: any) => {
       res.send(error.message);
@@ -123,15 +123,17 @@ app.post('/profile/editLink', auth, async (req, res) => {
 
 app.post('/profile/deleteLink', auth, (req, res) => {
   const user = res.locals.user;
-  console.log('user is ' + user);
+  console.log('user is ' + JSON.stringify(user));
   const linkObj = req.body.linkObj;
   console.log(linkObj);
   //pass link[i] from frontend as linkObj
-  linkMap.findByIdAndDelete(linkObj, (docs: typeof linkMap, err: Error) => {
+  mongoose.set('useFindAndModify', false);
+  linkMap.findByIdAndDelete(linkObj, (err: Error, docs: typeof linkMap) => {
     if (err) {
       res.status(500).send(err.message);
     } else {
-      res.send('Successfully deleted ' + docs.short_link);
+      res.status(200).redirect('/profile');
+      console.log('Successfully deleted ' + docs);
     }
   });
   const filter = {email: user.email};

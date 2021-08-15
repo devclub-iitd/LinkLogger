@@ -81,11 +81,12 @@
           let api = new XMLHttpRequest();
           api.open('POST', '/profile/deleteLink', true);
           api.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-          api.onload = () => {
-            if (api.status == 200) {
-              document.querySelector("#" + id).outerHTML = "";
-            }
-          };
+          // api.onload = () => {
+          //   if (api.status == 200) {
+          //     document.querySelector("#" + id).outerHTML = "";
+          //   }
+          // };
+          document.getElementById(id).outerHTML = "";
           api.send(JSON.stringify({ linkObj: id }));
         }
         function edit(id) {
