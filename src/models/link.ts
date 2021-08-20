@@ -4,7 +4,10 @@ const linkSchema = new Schema(
   {
     short_link: {
       type: String,
-      required: true,
+      unique: true,
+    },
+    title: {
+      type: String,
       unique: true,
     },
     original_link: {

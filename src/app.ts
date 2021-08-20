@@ -4,6 +4,8 @@ import linkMap from './models/link';
 import User from './models/user';
 import linkData from './models/link_data';
 import linktreeMap from './models/linktree';
+import reportMap from './models/report';
+import banned_linkMap from './models/banned_link';
 import auth from './middleware/auth';
 import {Request, Response} from 'express-serve-static-core';
 const cookieParser = require('cookie-parser');
@@ -724,6 +726,22 @@ app.get('/public_tree/:linktree_title', async (req, res) => {
       }
       res.render('public_tree', {links: links, linktree: linktree});
     });
+});
+
+app.post('/report', auth, async (req, res) => {
+  try {
+    const link = req.body.link;
+    const description = req.body.description;
+    const report = new reportMap({
+      link: link,
+      description: description,
+    });
+    await report.save().catch((err: Error) => {
+      res.send(err);
+    });
+  } catch (err) {
+    console.log('Error:  ' + err);
+  }
 });
 
 app.set('view engine', 'ejs');
