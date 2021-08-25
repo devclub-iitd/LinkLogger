@@ -5,10 +5,11 @@ const linkSchema = new Schema(
     short_link: {
       type: String,
       unique: true,
+      sparse: true,
+      partialFilterExpression: {short_link: {$exists: true}},
     },
     title: {
       type: String,
-      unique: true,
     },
     original_link: {
       type: String,

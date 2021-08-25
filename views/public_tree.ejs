@@ -30,7 +30,7 @@
                 <% links.forEach(link=> { %>
                     <a class="card bg-primary m-4 p-3" onclick='log_and_redirect("<%= link.id %>")'>
                         <h3 class="text-white">
-                            <%= link.short_link %>
+                            <%= link.title %>
                         </h3>
                     </a>
                     <% }) %>

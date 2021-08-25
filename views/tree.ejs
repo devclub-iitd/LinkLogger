@@ -44,10 +44,10 @@
       </div>
       <div class="card-body">
         <div class="row mb-3">
-          <label class="col-sm-2 col-form-label">Short Link</label>
+          <label class="col-sm-2 col-form-label">Title</label>
           <div class="col-sm-10">
             <input id="short_<%= links[i].id %>" readonly type="text" class="form-control"
-              value="<%= links[i].short_link %>">
+              value="<%= links[i].title %>">
           </div>
         </div>
         <div class="row mb-3">
@@ -71,7 +71,7 @@
         <button id="delete_<%= links[i].id %>" onclick="del('<%= links[i].id %>')" class="btn btn-danger">
           Delete
         </button>
-        <a href="/analytics/<%= linktree.title %>/<%= links[i].short_link %>">
+        <a href="/analytics/<%= linktree.title %>/<%= links[i]._id %>">
           <button id="analytics_<%= links[i].id %>" class="btn btn-info text-white">
             Analytics
           </button>
@@ -107,7 +107,7 @@
           api = new XMLHttpRequest();
           api.open('POST', '/profile/editLink', true);
           api.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-          api.send(JSON.stringify({ linkObj: id, original_link: original.value, short_link: short.value, expiry_date: new Date(expire.value) }));
+          api.send(JSON.stringify({ linkObj: id, original_link: original.value, short_link: null, title: short.value, expiry_date: new Date(expire.value) }));
           short.readOnly = true;
           original.readOnly = true;
           expire.readOnly = true;

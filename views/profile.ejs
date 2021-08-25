@@ -104,7 +104,7 @@
           api = new XMLHttpRequest();
           api.open('POST', '/profile/editLink', true);
           api.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-          api.send(JSON.stringify({ linkObj: id, original_link: original.value, short_link: short.value, expiry_date: new Date(expire.value) }));
+          api.send(JSON.stringify({ linkObj: id, original_link: original.value, short_link: short.value, title: null, expiry_date: new Date(expire.value) }));
           short.readOnly = true;
           original.readOnly = true;
           expire.readOnly = true;
