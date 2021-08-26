@@ -753,7 +753,7 @@ app.post('/report', auth, async (req, res) => {
     const link = req.body.txtLink;
     const email = req.body.txtEmail;
     const desc = req.body.txtDescription;
-    const description = `email: ${email}\t::${desc}`;
+    const description = `email: ${email}, \ndesc: ${desc}`;
     const report = new reportMap({
       link: link,
       description: description,
@@ -765,6 +765,17 @@ app.post('/report', auth, async (req, res) => {
   } catch (err) {
     console.log('Error:  ' + err);
   }
+});
+
+app.get('/view_reports', auth, async (req, res) => {
+  const reports = await reportMap.find({resolved: false});
+  const resolved_reports = await reportMap.find({resolved: true});
+  console.log('reports: ' + reports);
+  console.log('resolved_reports: ' + resolved_reports);
+  res.render('view_reports', {
+    reports: reports,
+    resolved_reports: resolved_reports,
+  });
 });
 
 app.set('view engine', 'ejs');
