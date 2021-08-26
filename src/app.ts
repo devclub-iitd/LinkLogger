@@ -744,17 +744,24 @@ app.get('/public_tree/:linktree_title', async (req, res) => {
     });
 });
 
+app.get('/report', (req, res) => {
+  res.render('report');
+});
+
 app.post('/report', auth, async (req, res) => {
   try {
-    const link = req.body.link;
-    const description = req.body.description;
+    const link = req.body.txtLink;
+    const email = req.body.txtEmail;
+    const desc = req.body.txtDescription;
+    const description = `email: ${email}\t::${desc}`;
     const report = new reportMap({
       link: link,
       description: description,
     });
     await report.save().catch((err: Error) => {
-      res.send(err);
+      res.send(err.message);
     });
+    res.status(200).send('Successfully submitted');
   } catch (err) {
     console.log('Error:  ' + err);
   }
