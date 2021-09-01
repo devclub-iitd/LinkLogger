@@ -36,11 +36,11 @@
 			transform: rotate(29deg);
 		}
 
-		.contact-form form {
+		.contact-form .form {
 			padding: 14%;
 		}
 
-		.contact-form form .row {
+		.contact-form .form .row {
 			margin-bottom: -7%;
 		}
 
@@ -85,8 +85,9 @@
 		</div>
 	</nav>
 	<div class="container contact-form">
-		<form method="post">
+		<div class="form">
 			<h3>Report Problem</h3>
+			<div id="status" class="alert alert-primary m-4" style="display: none"></div>
 			<div class="row">
 				<div class="col-md-6">
 					<div class="form-group">
@@ -97,9 +98,8 @@
 						<input type="text" id="txtLink" name="txtLink" class="form-control" placeholder="Link URL"
 							value="" />
 					</div>
-					<div class="form-group">
+					<div class="form-group text-center">
 						<input onclick="submit()" name="btnSubmit" class="btnContact" value="Submit" type="button" />
-						<div id="status" class="alert alert-primary m-4" style="display: none"></div>
 					</div>
 				</div>
 				<div class="col-md-6">
@@ -109,7 +109,7 @@
 					</div>
 				</div>
 			</div>
-		</form>
+		</div>
 	</div>
 	<script>
 		function validURL(s) {
@@ -126,7 +126,7 @@
 			status.style.display = 'none';
 			let txtLink = document.querySelector('input#txtLink').value;
 			if (!validURL(txtLink)) {
-				status.innerText = 'Please enter a valid Email URL';
+				status.innerText = 'Please enter a valid URL';
 				status.style.display = 'block';
 				return;
 			}

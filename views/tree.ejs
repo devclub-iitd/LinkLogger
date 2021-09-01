@@ -33,6 +33,7 @@
       </div>
     </div>
   </header>
+  <main class="container text-center mb-4">
   <% for (var i=0; i < links.length ; i++) {%>
     <div id="<%= links[i].id %>" class="card text-center m-4">
       <div class="card-header">
@@ -79,6 +80,29 @@
       </div>
     </div>
     <%}%>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#add">
+      Add Link
+    </button>
+    <div class="modal fade" id="add" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Link</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form method="POST" action="/LinkTree/<%= linktree.title %>/add_link">
+            <div class="modal-body">
+              <input required type="text" name="short_link" placeholder="Link Title" class="form-control m-1">
+              <input required type="url" name="original_link" placeholder="Link URL" class="form-control m-1">
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-success">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
       <script>
         function del(id) {
           let api = new XMLHttpRequest();
