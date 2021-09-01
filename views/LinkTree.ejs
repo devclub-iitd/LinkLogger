@@ -16,6 +16,7 @@
 </head>
 
 <body>
+    
     <nav class="navbar navbar-dark bg-dark">
         <div class="container">
             <a href="/link_generator"><button class="btn btn-primary">New Link</button></a>
@@ -39,20 +40,26 @@
         <div class="row text-center">
             <div class="col">
                 <% links.forEach(link=> { %>
-                    <div class="d-flex justify-content-around align-items-center">
+                    <div class="d-flex justify-content-around align-items-center" id="<%= link.name %>">
                         <span class="input-group-btn align-self-xl-center flex-shrink-1">
-                            <button class="btn btn-secondary" type="button" id="copy-button-<%= link.name %>"
+                            <button class="btn btn-light" type="button" id="copy-button-<%= link.name %>"
                                 data-toggle="tooltip" data-placement="top"
                                 title="Copy: 'http://localhost:5000/public_tree/<%= link.name %>' "
                                 onclick="copyFunction('<%= link.name %>')" onmouseout="outFunc('<%= link.name %>')">
-                                Copy Link
+                                <img src="https://img.icons8.com/color/40/000000/copy-link.png"/>
                             </button>
                         </span>
-                        <a class="card bg-primary m-4 p-2 flex-grow-1" href="<%=link.url%>">
+                        <a class="card bg-primary m-3 p-2 flex-grow-1" href="<%=link.url%>">
                             <h3 class="text-white">
                                 <%= link.name %>
                             </h3>
                         </a>
+                        <span class="input-group-btn align-self-xl-center flex-shrink-1">
+                            <button class="btn btn-light" type="button" id="delete-button-<%= link.name %>"
+                                data-placement="top" title="Delete <%= link.name %>" onclick="del('<%= link.name %>')">
+                                <img src="https://img.icons8.com/plasticine/40/filled-trash.png"/>
+                            </button>
+                        </span>
                     </div>
                     <% }) %>
             </div>
@@ -83,7 +90,16 @@
         function outFunc(link_name) {
             docID = "copy-button-" + link_name;
             var tooltip = document.getElementById(docID);
-            tooltip.innerHTML = "Copy Link";
+            tooltip.innerHTML = `<img src="https://img.icons8.com/color/40/000000/copy-link.png"/>`;
+        }
+
+        function del(linktree_name) {
+          let api = new XMLHttpRequest();
+          api.open('GET', `/LinkTree/${linktree_name}/delete`, true);
+          api.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+          console.log(linktree_name, " has been deleted");
+          document.getElementById(linktree_name).outerHTML = "";
+          api.send();
         }
     </script>
 </body>
