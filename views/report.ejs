@@ -7,8 +7,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Report</title>
 	<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-	<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<style>
 		body {
 			background: -webkit-linear-gradient(left, #0072ff, #00c6ff);
@@ -75,7 +73,7 @@
 </head>
 
 <body>
-	<nav class="navbar navbar-dark bg-dark">
+	<!-- <nav class="navbar navbar-dark bg-dark">
 		<div class="container">
 			<a href="/link_generator"><button class="btn btn-primary active">New Link</button></a>
 			<a href="/LinkTree/Create"><button class="btn btn-primary">New LinkTree</button></a>
@@ -83,7 +81,7 @@
 			<a href="/LinkTree"><button class="btn btn-primary">Manage LinkTrees</button></a>
 			</button></a>
 		</div>
-	</nav>
+	</nav> -->
 	<div class="container contact-form">
 		<div class="form">
 			<h3>Report Problem</h3>
@@ -98,9 +96,7 @@
 						<input type="text" id="txtLink" name="txtLink" class="form-control" placeholder="Link URL"
 							value="" />
 					</div>
-					<div class="form-group text-center">
-						<input onclick="submit()" name="btnSubmit" class="btnContact" value="Submit" type="button" />
-					</div>
+					
 				</div>
 				<div class="col-md-6">
 					<div class="form-group">
@@ -108,9 +104,17 @@
 							placeholder="Problem Description *" style="width: 100%; height: 150px;"></textarea>
 					</div>
 				</div>
+				<div class="col-md-6">
+					<div class="form-group text-center">
+						<input onclick="submit()" name="btnSubmit" class="btnContact" value="Submit" type="button" />
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
+	<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	
 	<script>
 		function validURL(s) {
 			try {

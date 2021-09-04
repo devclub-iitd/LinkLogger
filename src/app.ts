@@ -586,7 +586,7 @@ app.post('/LinkTree/:linktree/add_link', auth, (req, res) => {
         (err: Error, doc: typeof linktreeMap) => {
           if (err) return res.send(err.message);
           console.log('Updated linktree ' + doc.title);
-          res.status(200).redirect('/LinkTree/'+linktree_title);
+          res.status(200).redirect('/LinkTree/' + linktree_title);
         }
       );
     })
