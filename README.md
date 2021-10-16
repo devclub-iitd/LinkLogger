@@ -10,9 +10,11 @@ And creating and managing linktrees.
 4. Here are some instructions to setup CASI  (You can look at the instructions given in the CASI repo by DevClub & skip these steps):
     
     * Clone https://github.com/devclub-iitd/SingleSignOn/
-    * Copy .env.sample into .env 
-    ```cd SingleSignOn
-    cp .env.sample .env```
+    * Copy .env.sample into .env or run command:
+    ```
+    cd SingleSignOn
+    cp .env.sample .env
+    ```
     * Install *openSSL* on your system
     * Run 
     ```
