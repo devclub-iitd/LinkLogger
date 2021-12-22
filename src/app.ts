@@ -6,6 +6,22 @@ const mongoose = require('mongoose');
 
 // Create Express server.
 const app = express();
+const mongoose = require('mongoose');
+
+const dbURI =
+  'mongodb+srv://test_user:linklogging1234@linklogging.ijmqm.mongodb.net/link_logging?retryWrites=true&w=majority';
+mongoose
+  .connect(dbURI, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+  })
+  .then((result: string) => {
+    console.log('Connected to db');
+  })
+  .catch((error: string) => {
+    console.log(error);
+  });
 
 const dbURI =
   'mongodb+srv://test_user:linklogging1234@linklogging.ijmqm.mongodb.net/link_logging?retryWrites=true&w=majority';
@@ -25,7 +41,9 @@ mongoose
 // Express configuration
 app.set('port', process.env.PORT || 5000);
 app.set('views', path.join(__dirname, '../../views'));
+
 app.use(cookieParser());
+
 
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));

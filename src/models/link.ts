@@ -10,6 +10,7 @@ const linkSchema = new Schema(
     },
     title: {
       type: String,
+
     },
     original_link: {
       type: String,
