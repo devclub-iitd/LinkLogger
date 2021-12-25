@@ -2,10 +2,11 @@
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
     "rootDir": ".",
-    "outDir": "build"
+    "outDir": "build",
+    "noImplicitReturns": false
   },
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
-  ]
+, "src/middleware/auth.ts"  ]
 }

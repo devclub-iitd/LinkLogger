@@ -1,3 +1,4 @@
+package-lock.json
 # git
 .gitsecret/keys/random_seed
 !*.secret
@@ -112,6 +113,7 @@ dist
 #########################################
 build/
 .vscode
+public.pem
 
 # MAC
 .DS_Store

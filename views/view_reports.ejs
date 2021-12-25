@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"></script>
+    <style>
+        body {
+            background: #0083B0;
+            background: -webkit-linear-gradient(to right, #0083B0, #00B4DB);
+            background: linear-gradient(to right, #0083B0, #00B4DB);
+            min-height: 100vh;
+        }
+
+        .form-control::placeholder {
+            font-style: italic;
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container text-center text-white">
+        <div class="row pt-5">
+            <div class="col-lg-8 mx-auto">
+                <h1 class="display-4">Reports</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="card rounded-0 border-0 shadow">
+                    <div class="card-body p-5">
+
+                        <!--  Bootstrap table-->
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">URL</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% for( let i=0; i < reports.length; i++ ) { %>
+                                        <tr>
+                                            <th scope="row"><%= i+1 %> </th>
+                                            <td><%= reports[i].link %> </td>
+                                            <td><%= reports[i].description %> </td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container text-center text-white">
+        <div class="row pt-5">
+            <div class="col-lg-8 mx-auto">
+                <h1 class="display-4">Resolved Reports</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="card rounded-0 border-0 shadow">
+                    <div class="card-body p-5">
+
+                        <!--  Bootstrap table-->
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">URL</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% for( let i=0; i < resolved_reports.length; i++ ) { %>
+                                        <tr>
+                                            <th scope="row"><%= i+1 %> </th>
+                                            <td><%= resolved_reports[i].link %> </td>
+                                            <td><%= resolved_reports[i].description %> </td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
