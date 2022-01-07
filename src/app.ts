@@ -32,7 +32,7 @@ app.use(express.urlencoded({extended: false}));
 
 app.get('/', auth, (req, res) => {
   console.log(res.locals.user);
-  res.send('Link Logger is Active!');
+  res.render('home', {user: res.locals.user});
 });
 
 const linkGeneratorRouter = require('./routes/link_generator');
