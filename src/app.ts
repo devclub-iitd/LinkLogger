@@ -7,8 +7,10 @@ const mongoose = require('mongoose');
 // Create Express server.
 const app = express();
 
-const dbURI =
-  'mongodb+srv://test_user:linklogging1234@linklogging.ijmqm.mongodb.net/link_logging?retryWrites=true&w=majority';
+require('dotenv').config();
+
+const dbURI = process.env.DB_URL;
+
 mongoose
   .connect(dbURI, {
     useNewUrlParser: true,

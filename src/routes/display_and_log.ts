@@ -69,7 +69,7 @@ function log_user_data(req: Request, res: Response, result: typeof linkMap) {
   link_data.save();
 }
 
-router.get('/redirect_to/:short_link', auth, (req: Request, res: Response) => {
+router.get('/l/:short_link', auth, (req: Request, res: Response) => {
   const short_link = req.params.short_link;
   linkMap
     .findOne({short_link: short_link})
@@ -92,28 +92,25 @@ router.get('/redirect_to/:short_link', auth, (req: Request, res: Response) => {
     });
 });
 
-router.get(
-  '/public_tree/:linktree_title',
-  async (req: Request, res: Response) => {
-    //fetch the linktree, display set of links, log user data on clicking a link
-    let linktree: typeof linktreeMap;
-    let links_id;
-    let links: typeof linkMap[];
-    await linktreeMap
-      .findOne({title: req.params.linktree_title})
-      .then(async (result: typeof linktreeMap) => {
-        if (result === null) {
-          throw new Error('No linktree found');
-        }
-        linktree = result;
-        links_id = linktree.links;
-        links = new Array(links_id.length);
-        for (let i = 0; i < links_id.length; i++) {
-          links[i] = await linkMap.findById(links_id[i]);
-        }
-        res.render('public_tree', {links: links, linktree: linktree});
-      });
-  }
-);
+router.get('/lt/:linktree_title', async (req: Request, res: Response) => {
+  //fetch the linktree, display set of links, log user data on clicking a link
+  let linktree: typeof linktreeMap;
+  let links_id;
+  let links: typeof linkMap[];
+  await linktreeMap
+    .findOne({title: req.params.linktree_title})
+    .then(async (result: typeof linktreeMap) => {
+      if (result === null) {
+        throw new Error('No linktree found');
+      }
+      linktree = result;
+      links_id = linktree.links;
+      links = new Array(links_id.length);
+      for (let i = 0; i < links_id.length; i++) {
+        links[i] = await linkMap.findById(links_id[i]);
+      }
+      res.render('public_tree', {links: links, linktree: linktree});
+    });
+});
 
 module.exports = router;
