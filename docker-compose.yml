@@ -27,7 +27,7 @@ services:
             - ./.env
         environment:
             - VIRTUAL_HOST
-            - MONGODB_URI_LOCAL
+            - DB_URL
         depends_on:
             - database
 
