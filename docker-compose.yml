@@ -4,13 +4,13 @@ services:
     database:
         image: '${REGISTRY_NAME}mongo:4.4'
         volumes:
-            - casidb:/data/db
+            - linklogger:/data/db
         networks:
             - 'internal'
         restart: 'unless-stopped'
     CASI:
         build: .
-        image: '${REGISTRY_NAME}devclubiitd/casi:0.1'
+        image: '${REGISTRY_NAME}devclubiitd/linklogger:0.1'
         ports:
             - ${PORT}:${PORT}
         healthcheck:
@@ -32,7 +32,7 @@ services:
             - database
 
 volumes:
-    casidb:
+    linklogger:
 
 networks:
     reverseproxy:
