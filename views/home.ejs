@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Josefin+Sans&display=swap"
+        rel="stylesheet">
+    <title>Link Logger</title>
+</head>
+
+<!-- Background image -->
+
+<body class="text-center"
+    style="background-image: url('https://products.ls.graphics/mesh-gradients/images/27.-Melanie_1.jpg'); height:100vh">
+    <!-- Heading -->
+    <header class="p-3 text-white justify-content-center">
+        <div class="d-flex justify-content-center align-items-center">
+            <div class="m-2">
+                <h1 style="font-family: 'Abril Fatface'">Link Logger</h1>
+            </div>
+        </div>
+    </header>
+
+    <div id="intro-example" class="p-5 text-center bg-image m-5 border border-3 border-white rounded ">
+
+        <div class="d-flex justify-content-center align-items-center h-100">
+            <div class="text-white">
+                <!-- List for typing effect -->
+                <h3 style="font-family: 'Josefin Sans', cursive;">
+                    <a class="typewrite" data-period="2000"
+                        data-type='[ "Shorten URLs", "Analyse Userbase", "Create LinkTrees"]'>
+                        <span class="wrap"></span>
+                    </a>
+                </h3>
+
+                <h4 class="mb-4">
+                    for all your links...
+                </h4>
+                <!-- Link Buttons -->
+                <a class="btn btn-outline-light btn-lg m-2" href="/profile/" role="button" rel="nofollow">
+                    Sign In
+                </a>
+                <a class="btn btn-outline-light btn-lg m-2" href="https://devclub.in/#/" role="button">
+                    Visit DevClub
+                </a>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
+    </script>
+
+    <!-- Typing effect JS -->
+    <script>
+        var TxtType = function (el, toRotate, period) {
+            this.toRotate = toRotate;
+            this.el = el;
+            this.loopNum = 0;
+            this.period = parseInt(period, 10) || 2000;
+            this.txt = '';
+            this.tick();
+            this.isDeleting = false;
+        };
+
+        TxtType.prototype.tick = function () {
+            var i = this.loopNum % this.toRotate.length;
+            var fullTxt = this.toRotate[i];
+
+            if (this.isDeleting) {
+                this.txt = fullTxt.substring(0, this.txt.length - 1);
+            } else {
+                this.txt = fullTxt.substring(0, this.txt.length + 1);
+            }
+
+            this.el.innerHTML = '<span class="wrap">' + this.txt + '</span>';
+
+            var that = this;
+            var delta = 200 - Math.random() * 100;
+
+            if (this.isDeleting) { delta /= 2; }
+
+            if (!this.isDeleting && this.txt === fullTxt) {
+                delta = this.period;
+                this.isDeleting = true;
+            } else if (this.isDeleting && this.txt === '') {
+                this.isDeleting = false;
+                this.loopNum++;
+                delta = 500;
+            }
+
+            setTimeout(function () {
+                that.tick();
+            }, delta);
+        };
+
+        window.onload = function () {
+            var elements = document.getElementsByClassName('typewrite');
+            for (var i = 0; i < elements.length; i++) {
+                var toRotate = elements[i].getAttribute('data-type');
+                var period = elements[i].getAttribute('data-period');
+                if (toRotate) {
+                    new TxtType(elements[i], JSON.parse(toRotate), period);
+                }
+            }
+            // INJECT CSS
+            var css = document.createElement("style");
+            css.type = "text/css";
+            css.innerHTML = ".typewrite > .wrap { border-right: 0.08em solid #fff}";
+            document.body.appendChild(css);
+        };
+
+    </script>
+
+</body>
+
+</html>
