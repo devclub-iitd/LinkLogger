@@ -8,6 +8,7 @@ services:
         networks:
             - 'internal'
         restart: 'unless-stopped'
+
     LinkLogger:
         build: .
         image: '${REGISTRY_NAME}devclubiitd/linklogger:0.1'
