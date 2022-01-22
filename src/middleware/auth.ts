@@ -6,11 +6,14 @@ const path = require('path');
 import {Request, Response, NextFunction} from 'express';
 
 // SSO Url for refreshing tokens that are about to expire
-const SSO_Refresh_URL = 'http://localhost:8000/auth/refresh-token';
-const SSO_Login_URL = 'http://localhost:8000/user/login?serviceURL=';
+//const SSO_Refresh_URL = 'http://localhost:8000/auth/refresh-token';
+//const SSO_Login_URL = 'http://localhost:8000/user/login?serviceURL=';
+
+const SSO_Refresh_URL = 'https://auth.devclub.in/auth/refresh-token';
+const SSO_Login_URL = 'https://auth.devclub.in/user/login?serviceURL=';
 
 // Client url, this string should be equal to the exact base URL of the client
-const clientURL = 'http://localhost:5000';
+const clientURL = 'https://go.devclub.in';
 
 const accessTokenName = 'token'; // The default JWT token name
 const refreshTokenName = 'rememberme'; // Name for remember me style tokens
