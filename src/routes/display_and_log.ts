@@ -15,6 +15,10 @@ useragent(true);
 const ip2loc = require('ip2location-nodejs');
 ip2loc.IP2Location_init(path.join(__dirname, '../../IP_DATA.BIN'));
 
+router.get('/healthz', (req: Request, res: Response) => {
+  res.send('OK');
+});
+
 router.post('/log_linktree', async (req: Request, res: Response) => {
   console.log('in log_linktree');
   let link: typeof linkMap;
