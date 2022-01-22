@@ -113,7 +113,6 @@ dist
 #########################################
 build/
 .vscode
-public.pem
 
 # MAC
 .DS_Store
