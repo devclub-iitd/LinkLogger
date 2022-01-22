@@ -14,9 +14,8 @@ RUN npm install
 COPY . .
 
 RUN npm run compile
-COPY public.pem /build/
-COPY IP_DATA.bin /build/
-WORKDIR /build
+COPY public.pem ./build
+COPY IP_DATA.bin ./build
 
 RUN ["chmod", "+x", "/code/entry-point.sh"]
 
