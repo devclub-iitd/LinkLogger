@@ -15,7 +15,7 @@ COPY . .
 
 RUN npm run compile
 COPY public.pem ./build
-COPY IP_DATA.bin ./build
+COPY IP_DATA.BIN ./build
 
 RUN ["chmod", "+x", "/code/entry-point.sh"]
 
