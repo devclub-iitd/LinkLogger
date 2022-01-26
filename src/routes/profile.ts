@@ -6,18 +6,40 @@ import auth from '../middleware/auth';
 import {Request, Response} from 'express-serve-static-core';
 const mongoose = require('mongoose');
 
+// router.get('/', auth, (req: Request, res: Response) => {
+//   try {
+//     const user = res.locals.user;
+//     const query = {username: user.username, email: user.email};
+//     User.findOne(query).then(async (result: typeof User) => {
+//       const links_id = result.links;
+//       const links: typeof linkMap[] = new Array(links_id.length);
+//       for (let i = 0; i < links_id.length; i++) {
+//         links[i] = await linkMap.findById(links_id[i]);
+//       }
+//       res.render('profile', {links: links, user: user});
+//     });
+//   } catch (JsonWebTokenError) {
+//     res.render('<h1>Unauthorized</h1>');
+//   }
+// });
+
 router.get('/', auth, (req: Request, res: Response) => {
   try {
     const user = res.locals.user;
     const query = {username: user.username, email: user.email};
-    User.findOne(query).then(async (result: typeof User) => {
-      const links_id = result.links;
-      const links: typeof linkMap[] = new Array(links_id.length);
-      for (let i = 0; i < links_id.length; i++) {
-        links[i] = await linkMap.findById(links_id[i]);
+    const update = {username: user.username, email: user.email};
+    User.findOneAndUpdate(query, update, {upsert: true}).then(
+      async (result: typeof User) => {
+        if (result !== null) {
+          const links_id = result.links;
+          const links: typeof linkMap[] = new Array(links_id.length);
+          for (let i = 0; i < links_id.length; i++) {
+            links[i] = await linkMap.findById(links_id[i]);
+          }
+          res.render('profile', {links: links, user: user});
+        }
       }
-      res.render('profile', {links: links, user: user});
-    });
+    );
   } catch (JsonWebTokenError) {
     res.render('<h1>Unauthorized</h1>');
   }
