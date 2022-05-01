@@ -27,7 +27,7 @@
           <a href="/profile"><button class="btn btn-primary active m-1 me-3">Manage Links</button></a>
           <a href="/LinkTree"><button class="btn btn-primary m-1 me-3">Manage LinkTrees</button></a>
         </div>
-        <a href="http://localhost:8000/">
+        <a href="/">
           <button class="btn btn-secondary">Logged in as <%= user.username%></button>
         </a>
       </div>
@@ -95,7 +95,7 @@
         </a>
         <button class="btn btn-secondary" type="button" id="copy-button-<%= links[i].short_link %>"
           data-toggle="tooltip" data-placement="top"
-          title="Copy: 'http://localhost:5000/redirect_to/<%= links[i].short_link %>' "
+          title="Copy: 'https://go.devclub.in/l/<%= links[i].short_link %>' "
           onclick="copyFunction('<%= links[i].short_link %>')" onmouseout="outFunc('<%= links[i].short_link %>')">
           Copy Link
         </button>
@@ -152,7 +152,7 @@
 
         function copyFunction(link_name) {
           console.log(link_name);
-          var copyText = "http://localhost:5000/redirect_to/" + link_name;
+          var copyText = "https://go.devclub.in/l/" + link_name;
           console.log('copyText: ' + copyText);
           navigator.clipboard.writeText(copyText);
 

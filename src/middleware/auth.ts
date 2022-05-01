@@ -43,7 +43,7 @@ interface JWTToken {
 // to the SSO Login Page
 const redirectURL = '';
 // Array of public paths, these paths will be available without logging in and even for users that do not have sufficient permisisons
-const publicPaths = ['^/public.*', '^/asset.*', '^/$', '^/redirect_to.*'];
+const publicPaths = ['^/public.*', '^/asset.*', '^/$', '^/l.*', '^/lt.*'];
 
 const UnauthorizedHandler = (req: Request, res: any) => {
   return res
